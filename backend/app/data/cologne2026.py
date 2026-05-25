@@ -5,10 +5,13 @@
   - Stage 2: those 8 + the 8 Stage-2 invites.  Top 8 advance.
   - Stage 3: those 8 + the 8 Stage-3 direct invites.  Top 8 -> playoffs.
 
-Seeds here follow the published invite order, which tracks Valve Global Standings
-closely but is PROVISIONAL — refresh from Liquipedia / Valve standings before the
-event via app.data.liquipedia. Ratings are derived from seed (see app.ratings) until
-real odds / HLTV data are loaded.
+Seeds within each stage are ordered by Valve Global Standings VRS points (re-seeded
+2026-05-26 from github.com/ValveSoftware/counter-strike_regional_standings). Still
+PROVISIONAL: the invited field and stage split are the announced bracket and should be
+re-checked against Liquipedia before the event; re-run the VRS ordering to refresh.
+Teams absent from the global table (e.g. THUNDERdOWNUNDER) are seeded last in their
+stage. Ratings are derived from seed (see app.ratings) until real odds / HLTV / Valve
+data are loaded.
 """
 
 from __future__ import annotations
@@ -49,14 +52,14 @@ STAGE1_INVITES: list[str] = [
     "M80",
     "MIBR",
     "SINNERS Esports",
-    "NRG",
     "TYLOO",
     "Sharks Esports",
     "Gaimin Gladiators",
     "Team Liquid",
     "Lynn Vision Gaming",
-    "THUNDERdOWNUNDER",
     "FlyQuest",
+    "NRG",
+    "THUNDERdOWNUNDER",
 ]
 
 
