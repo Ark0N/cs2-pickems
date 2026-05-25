@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"idle_prompt\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"permission_prompt\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"elicitation_dialog\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"stop\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"teammate_idle\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HOOK_DATA=$(cat 2>/dev/null || echo '{}'); printf '{\"event\":\"task_completed\",\"sessionId\":\"%s\",\"data\":%s}' \"$CODEMAN_SESSION_ID\" \"$HOOK_DATA\" | curl -s -X POST \"$CODEMAN_API_URL/api/hook-event\" -H 'Content-Type: application/json' --data @- 2>/dev/null || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  },
+  "model": "opus[1m]"
+}

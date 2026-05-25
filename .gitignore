@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Env / secrets
+.env
+.env.local
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Data cache (snapshots are regenerated; keep the dir, ignore contents)
+data/cache/
+data/snapshots/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
