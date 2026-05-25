@@ -1,6 +1,10 @@
 import type { AnalyzeRequest, AnalyzeResponse, PlayoffsResponse, TeamInfo } from "./types";
 
-const BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "http://localhost:8000";
+// Default to the API on the SAME host the UI was loaded from (so it works whether
+// opened via localhost or the Tailscale IP). Override with VITE_API_BASE if needed.
+const BASE =
+  (import.meta.env.VITE_API_BASE as string | undefined) ??
+  `${window.location.protocol}//${window.location.hostname}:8000`;
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const resp = await fetch(`${BASE}${path}`, {
