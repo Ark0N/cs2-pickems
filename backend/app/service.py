@@ -24,6 +24,7 @@ def run_analysis(
     objective: str = "category",
     enforce_feasible: bool = True,
     use_hltv: bool = False,
+    use_valve: bool = False,
     use_odds: bool = False,
     results: list[MatchResult] | None = None,
     rating_overrides: dict[str, float] | None = None,
@@ -36,6 +37,7 @@ def run_analysis(
         stage,
         results=results,
         use_hltv=use_hltv,
+        use_valve=use_valve,
         stage1_advancers=stage1_advancers,
         stage2_advancers=stage2_advancers,
     )

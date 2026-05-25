@@ -70,6 +70,7 @@ export interface AnalyzeRequest {
   objective: "category" | "ev";
   enforce_feasible: boolean;
   use_hltv: boolean;
+  use_valve: boolean;
   use_odds: boolean;
   results: MatchResultIn[];
   rating_overrides: Record<string, number>;

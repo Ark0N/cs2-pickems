@@ -71,12 +71,19 @@ cd backend && uv run pytest -q && uv run ruff check .
 ## Data sources & keys
 
 All sources degrade gracefully — the app works offline on a transparent seed-based
-rating prior. To enable live data, copy `.env.example` → `.env` (repo root):
+rating prior. **No API key is required** to use real strength data:
 
-- `ODDS_API_KEY` — OddsPapi (free tier, 250 req/mo). De-vigged odds override per-matchup
-  win probabilities. Without it, ratings come from HLTV/seed only.
-- HLTV ranking is scraped best-effort (Cloudflare-protected; cached, rate-limited).
-- Liquipedia (MediaWiki API) provides teams/seeding/results.
+- **Valve VRS (recommended, free, no key):** the official Global Standings that seed the
+  Major, pulled from Valve's public GitHub repo and rescaled to ratings. Enabled by the
+  "Valve VRS ratings" toggle (on by default) or `--use-valve`. Source:
+  `app/data/valve_standings.py`.
+- **HLTV ranking** — scraped best-effort (Cloudflare-protected; cached, rate-limited);
+  `--use-hltv`.
+- **Betting odds** (optional, needs a key) — set `ODDS_API_KEY` (OddsPapi free tier) in
+  `.env`; de-vigged odds then override per-matchup win probabilities (`--use-odds`).
+- **Liquipedia** (MediaWiki API) provides teams/seeding/results.
+
+Ratings priority when multiple are enabled: **Valve VRS → HLTV → seed prior**.
 
 > Seeds in `app/data/cologne2026.py` are **provisional** (published invite order). Refresh
 > from Valve Global Standings / Liquipedia before the event.

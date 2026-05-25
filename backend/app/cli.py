@@ -33,6 +33,9 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument(
         "--use-hltv", action="store_true", help="refine ratings from HLTV ranking"
     )
+    ap.add_argument(
+        "--use-valve", action="store_true", help="ratings from Valve VRS standings (free, no key)"
+    )
     ap.add_argument("--objective", choices=["category", "ev"], default="category")
     args = ap.parse_args(argv)
 
@@ -42,7 +45,7 @@ def main(argv: list[str] | None = None) -> None:
             "use the API once earlier-stage results are in."
         )
 
-    state = build_stage(args.stage, use_hltv=args.use_hltv)
+    state = build_stage(args.stage, use_hltv=args.use_hltv, use_valve=args.use_valve)
     probs = build_map_probs(state, odds_override_probs(state, use_odds=args.use_odds))
     sim = simulate_stage(state, map_probs=probs, n_sims=args.sims, rng_seed=args.seed)
     result = optimize(sim, objective=args.objective, enforce_feasible=not args.allow_impossible)

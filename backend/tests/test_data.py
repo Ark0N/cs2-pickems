@@ -3,6 +3,30 @@ from app.data.hltv import rank_order_to_ratings
 from app.data.liquipedia import parse_results
 from app.data.loader import build_map_probs, build_stage
 from app.data.odds import fixtures_to_prob_map, normalize_team
+from app.data.valve_standings import parse_global_standings, points_to_ratings
+
+VALVE_SAMPLE = """\
+| Standing | Points | Team Name     | Roster |
+| :- | -: | :- | :- |
+| 1 | 1964 | Vitality      | apEX, flameZ, mezii, Spinx, ZywOo |
+| 2 | 1941 | Natus Vincere | Aleksib, b1t, iM, jL, w0nderful |
+| 3 | 1938 | G2            | huNter-, m0NESY, malbsMd, NiKo, Snax |
+"""
+
+
+def test_parse_global_standings_normalizes_and_skips_header():
+    pts = parse_global_standings(VALVE_SAMPLE)
+    assert pts["Team Vitality"] == 1964.0  # name normalized, header/separator skipped
+    assert pts["Natus Vincere"] == 1941.0
+    assert pts["G2 Esports"] == 1938.0
+    assert "Standing" not in pts and len(pts) == 3
+
+
+def test_points_to_ratings_spans_spread_and_orders():
+    r = points_to_ratings({"A": 2000, "B": 1500, "C": 1000}, spread=400, base=1500)
+    assert abs(r["A"] - 1700) < 1e-9  # top -> base + spread/2
+    assert abs(r["C"] - 1300) < 1e-9  # bottom -> base - spread/2
+    assert r["A"] > r["B"] > r["C"]
 
 
 def test_normalize_team_aliases():

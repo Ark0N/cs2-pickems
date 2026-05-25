@@ -12,6 +12,7 @@ import numpy as np
 from app.data.cologne2026 import stage1_teams, stage2_teams, stage3_teams
 from app.data.hltv import HLTVClient, rank_order_to_ratings
 from app.data.odds import OddsClient, fixtures_to_prob_map
+from app.data.valve_standings import ValveStandingsClient, points_to_ratings
 from app.models import MatchResult, StageState, Team
 from app.ratings import apply_seed_ratings, map_prob_matrix
 
@@ -30,15 +31,22 @@ def base_teams(
     raise ValueError("stage must be 1, 2 or 3")
 
 
-def apply_ratings(teams: list[Team], use_hltv: bool = False) -> list[Team]:
-    teams = apply_seed_ratings(teams)  # transparent prior
+def apply_ratings(
+    teams: list[Team], use_hltv: bool = False, use_valve: bool = False
+) -> list[Team]:
+    """Fill team ratings. Priority: Valve VRS (no key) > HLTV ranking > seed prior."""
+    teams = apply_seed_ratings(teams)  # transparent baseline, always present
+    if use_valve:
+        points = ValveStandingsClient().latest_global_points()
+        matched = {t.name: points[t.name] for t in teams if t.name in points}
+        if len(matched) >= 4:  # enough of the field to rescale meaningfully
+            ratings = points_to_ratings(matched)
+            return [t.model_copy(update={"rating": ratings.get(t.name, t.rating)}) for t in teams]
     if use_hltv:
         order = HLTVClient().world_ranking_order()
         if order:
             ratings = rank_order_to_ratings(order)
-            teams = [
-                t.model_copy(update={"rating": ratings.get(t.name, t.rating)}) for t in teams
-            ]
+            return [t.model_copy(update={"rating": ratings.get(t.name, t.rating)}) for t in teams]
     return teams
 
 
@@ -46,11 +54,14 @@ def build_stage(
     stage: int,
     results: list[MatchResult] | None = None,
     use_hltv: bool = False,
+    use_valve: bool = False,
     stage1_advancers: list[str] | None = None,
     stage2_advancers: list[str] | None = None,
 ) -> StageState:
     teams = apply_ratings(
-        base_teams(stage, stage1_advancers, stage2_advancers), use_hltv=use_hltv
+        base_teams(stage, stage1_advancers, stage2_advancers),
+        use_hltv=use_hltv,
+        use_valve=use_valve,
     )
     return StageState(stage=stage, teams=teams, results=results or [], bo3_all=(stage == 3))
 

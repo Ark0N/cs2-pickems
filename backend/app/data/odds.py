@@ -43,6 +43,14 @@ TEAM_ALIASES: dict[str, str] = {
     "9z team": "9z Team",
     "pain": "paiN Gaming",
     "pain gaming": "paiN Gaming",
+    # Cologne field name variants (e.g. Valve VRS spellings)
+    "sinners": "SINNERS Esports",
+    "sharks": "Sharks Esports",
+    "lynn vision": "Lynn Vision Gaming",
+    "gaimin gladiators": "Gaimin Gladiators",
+    "gamin gladiators": "Gaimin Gladiators",
+    "fut": "FUT Esports",
+    "aurora": "Aurora Gaming",
 }
 
 

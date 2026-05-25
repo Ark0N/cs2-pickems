@@ -50,6 +50,7 @@ class AnalyzeRequest(BaseModel):
     objective: str = "category"
     enforce_feasible: bool = True
     use_hltv: bool = False
+    use_valve: bool = False
     use_odds: bool = False
     results: list[MatchResultIn] = []
     rating_overrides: dict[str, float] = {}
@@ -100,6 +101,7 @@ def analyze(req: AnalyzeRequest):
             objective=req.objective,
             enforce_feasible=req.enforce_feasible,
             use_hltv=req.use_hltv,
+            use_valve=req.use_valve,
             use_odds=req.use_odds,
             results=[MatchResult(**r.model_dump()) for r in req.results],
             rating_overrides=req.rating_overrides,

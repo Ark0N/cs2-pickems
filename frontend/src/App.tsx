@@ -18,6 +18,7 @@ export default function App() {
   const [nSims, setNSims] = useState(15000);
   const [objective, setObjective] = useState<"category" | "ev">("category");
   const [enforceFeasible, setEnforceFeasible] = useState(true);
+  const [useValve, setUseValve] = useState(true);
   const [useHltv, setUseHltv] = useState(false);
   const [useOdds, setUseOdds] = useState(false);
 
@@ -38,6 +39,7 @@ export default function App() {
       objective,
       enforce_feasible: enforceFeasible,
       use_hltv: useHltv,
+      use_valve: useValve,
       use_odds: useOdds,
       results,
       rating_overrides: overrides,
@@ -48,7 +50,7 @@ export default function App() {
       })
       .catch((e) => setError(String(e)))
       .finally(() => setLoading(false));
-  }, [nSims, objective, enforceFeasible, useHltv, useOdds, results, overrides]);
+  }, [nSims, objective, enforceFeasible, useHltv, useValve, useOdds, results, overrides]);
 
   // debounce re-analysis when inputs change
   useEffect(() => {
@@ -112,6 +114,10 @@ export default function App() {
             <label className="check">
               <input type="checkbox" checked={enforceFeasible} onChange={(e) => setEnforceFeasible(e.target.checked)} />
               avoid impossible pairs
+            </label>
+            <label className="check">
+              <input type="checkbox" checked={useValve} onChange={(e) => setUseValve(e.target.checked)} />
+              Valve VRS ratings (free)
             </label>
             <label className="check">
               <input type="checkbox" checked={useHltv} onChange={(e) => setUseHltv(e.target.checked)} />
