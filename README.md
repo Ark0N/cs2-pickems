@@ -2,9 +2,10 @@
 
 A data-driven engine for mastering the **IEM Cologne Major 2026** Pick'Em Challenge (June 2026).
 
-The optimizer fuses the market's collective wisdom — the win probabilities implied by live
-**betting odds** — with the official **HLTV** and **Valve** world rankings to build a nuanced
-picture of each team's true strength. From there it runs a full **Monte Carlo** simulation of
+The optimizer builds each team's strength from the official **Valve** world ranking (with
+**HLTV** and an offline seed prior as automatic fallbacks), and can optionally fold in the
+market's collective wisdom — the win probabilities implied by live **betting odds** — to
+sharpen individual matchups. From there it runs a full **Monte Carlo** simulation of
 every Swiss stage, faithfully reproducing Valve's real **Buchholz** pairing rules, and weighs
 the entire spread of plausible outcomes to settle on the most rewarding set of predictions for
 each stage. Just as importantly, it exposes the hidden contradictions that quietly sink most
