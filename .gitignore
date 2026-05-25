@@ -15,6 +15,10 @@ venv/
 node_modules/
 frontend/dist/
 frontend/.vite/
+# tsc -b build artifacts
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # Data cache (snapshots are regenerated; keep the dir, ignore contents)
 data/cache/

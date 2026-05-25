@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/bar.tsx","./src/components/livebracket.tsx","./src/components/playoffs.tsx","./src/components/probtable.tsx","./src/components/recommendation.tsx","./src/components/teamstrengtheditor.tsx","./src/components/warnings.tsx"],"version":"5.9.3"}
