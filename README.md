@@ -9,9 +9,8 @@ rules** (Monte Carlo), and recommends the **optimal 10-pick set** (2× 3-0, 2× 
 must play each other can't both finish 3-0). Also covers the playoff bracket and
 cosmetic picks, all in an interactive web app.
 
-## Example: the picks it recommends
-
-The optimizer fills the in-game Pick'Em for you. Example output for **Stage 1** of
+## The Picks
+**Stage 1** 
 IEM Cologne 2026 (Valve VRS ratings + live keyless odds, 100k Monte Carlo sims):
 
 ![Stage 1 Pick'Em recommendation — 2× 3-0, 6× advance, 2× 0-3](docs/screenshots/cs2-pickem-cologne-stage1.png)
