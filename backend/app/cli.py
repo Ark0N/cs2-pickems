@@ -11,22 +11,10 @@ from __future__ import annotations
 
 import argparse
 
-from app.data.cologne2026 import stage1_teams
-from app.models import StageState
+from app.data.loader import build_map_probs, build_stage, odds_override_probs
 from app.optimizer import optimize
-from app.ratings import apply_seed_ratings
 from app.report import format_report
 from app.simulate import simulate_stage
-
-
-def build_stage(stage: int) -> StageState:
-    if stage == 1:
-        teams = apply_seed_ratings(stage1_teams())
-        return StageState(stage=1, teams=teams)
-    raise SystemExit(
-        f"stage {stage} needs the advancing teams from the previous stage; "
-        "use the API/data layer to assemble it once Stage 1 results are in."
-    )
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -39,11 +27,25 @@ def main(argv: list[str] | None = None) -> None:
         action="store_true",
         help="do not enforce joint feasibility on the 3-0 / 0-3 pairs",
     )
+    ap.add_argument(
+        "--use-odds", action="store_true", help="pull betting odds (needs ODDS_API_KEY)"
+    )
+    ap.add_argument(
+        "--use-hltv", action="store_true", help="refine ratings from HLTV ranking"
+    )
+    ap.add_argument("--objective", choices=["category", "ev"], default="category")
     args = ap.parse_args(argv)
 
-    state = build_stage(args.stage)
-    sim = simulate_stage(state, n_sims=args.sims, rng_seed=args.seed)
-    result = optimize(sim, enforce_feasible=not args.allow_impossible)
+    if args.stage != 1:
+        raise SystemExit(
+            f"stage {args.stage} needs the advancing teams from the previous stage; "
+            "use the API once earlier-stage results are in."
+        )
+
+    state = build_stage(args.stage, use_hltv=args.use_hltv)
+    probs = build_map_probs(state, odds_override_probs(state, use_odds=args.use_odds))
+    sim = simulate_stage(state, map_probs=probs, n_sims=args.sims, rng_seed=args.seed)
+    result = optimize(sim, objective=args.objective, enforce_feasible=not args.allow_impossible)
     print(format_report(sim, result, state, title=f"IEM Cologne Major 2026 — Stage {args.stage}"))
 
 
