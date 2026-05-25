@@ -59,6 +59,7 @@ class StageState(BaseModel):
     advance_at: int = 3  # wins needed to advance
     eliminate_at: int = 3  # losses that eliminate
     bo3_all: bool = False  # Stage 3: every match is Bo3
+    ratings_source: dict | None = None  # provenance of the ratings actually used
 
     @property
     def team_names(self) -> list[str]:

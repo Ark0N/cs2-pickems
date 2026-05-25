@@ -44,6 +44,29 @@ export interface Warning {
   teams: string[];
 }
 
+export interface RatingsSource {
+  source: "valve" | "hltv" | "seed";
+  label: string;
+  detail: string;
+  requested: { valve: boolean; hltv: boolean };
+  notes: string[];
+}
+
+export interface OddsSource {
+  provider: string;
+  keyless: boolean | null;
+  requested: boolean;
+  fixtures: number;
+  applied_matchups: number;
+  available: boolean;
+  note: string | null;
+}
+
+export interface DataSources {
+  ratings: RatingsSource | null;
+  odds: OddsSource;
+}
+
 export interface Match {
   team_a: string;
   team_b: string;
@@ -87,6 +110,7 @@ export interface AnalyzeResponse {
   recommendation: Recommendation;
   warnings: Warning[];
   impossible_three_oh_pairs: [string, string][];
+  data_sources: DataSources;
 }
 
 export interface PlayoffProb {

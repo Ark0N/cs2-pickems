@@ -1,16 +1,22 @@
 """Betting-odds ingestion.
 
 Pulls CS2 match-winner odds and converts them to fair (de-vigged) win
-probabilities. Default provider is OddsPapi (free tier, REST, `?apiKey=`,
-`sportId=17` for esports). Everything degrades gracefully: with no key or no
-network the client returns nothing and the engine falls back to ranking ratings.
+probabilities. Two providers ship:
 
-The transform functions (`devig_fixture`, `fixtures_to_prob_map`, `normalize_team`)
-are pure and unit-tested; the live HTTP/parse layer is best-effort and may need
-tweaking to the provider's exact JSON shape.
+- **bovada** (default, **keyless**): Bovada's public coupon JSON — no API key,
+  no signup. Used purely as a probability signal (no real-money betting).
+- **oddspapi**: OddsPapi free tier (REST, `?apiKey=`, `sportId=17`); needs a key.
+
+Everything degrades gracefully: with no network/odds the client returns nothing
+and the engine falls back to ranking ratings.
+
+The transform functions (`devig_fixture`, `fixtures_to_prob_map`, `normalize_team`,
+`parse_bovada_events`) are pure and unit-tested; the live HTTP layer is best-effort.
 """
 
 from __future__ import annotations
+
+import re
 
 import httpx
 
@@ -91,6 +97,10 @@ def fixtures_to_prob_map(
 
 
 class OddsClient:
+    """OddsPapi (keyed) provider."""
+
+    keyless = False
+
     def __init__(self, api_key: str | None = None, provider: str | None = None):
         self.api_key = api_key if api_key is not None else settings.odds_api_key
         self.provider = provider or settings.odds_provider
@@ -142,3 +152,113 @@ class OddsClient:
                     {"team_a": name_a, "team_b": name_b, "odd_a": odd_a, "odd_b": odd_b}
                 )
         return fixtures
+
+
+# --- Bovada (keyless) -----------------------------------------------------------
+
+
+def slugify_tournament(name: str) -> str:
+    """'IEM Cologne' -> 'iem-cologne' (matches Bovada's link slugs)."""
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _match_moneyline(ev: dict) -> dict | None:
+    """The full-match Moneyline market (period 'Game'/key '2W-12'), not per-map."""
+    fallback = None
+    for group in ev.get("displayGroups") or []:
+        for market in group.get("markets") or []:
+            if market.get("description") != "Moneyline":
+                continue
+            period = ((market.get("period") or {}).get("description") or "").lower()
+            if "map" in period:  # per-map moneyline — ignore
+                continue
+            if market.get("key") == "2W-12":
+                return market
+            fallback = fallback or market
+    return fallback
+
+
+def parse_bovada_events(data, tournament: str | None = None) -> list[dict]:
+    """Parse Bovada's coupon JSON into [{team_a, team_b, odd_a, odd_b}] (decimal odds).
+
+    Keeps only each match's full-match Moneyline. The CS2 esports feed mixes several
+    tournaments, so when `tournament` is given only events whose link contains its
+    slug (e.g. 'iem-cologne') are kept.
+    """
+    slug = slugify_tournament(tournament) if tournament else None
+    blocks = data if isinstance(data, list) else [data]
+    out: list[dict] = []
+    for block in blocks:
+        for ev in block.get("events", []):
+            if slug and slug not in (ev.get("link") or "").lower():
+                continue
+            if len(ev.get("competitors") or []) != 2:
+                continue
+            market = _match_moneyline(ev)
+            if market is None:
+                continue
+            prices: dict[str, float] = {}
+            for oc in market.get("outcomes") or []:
+                name = oc.get("description")
+                dec = (oc.get("price") or {}).get("decimal")
+                try:
+                    if name and dec:
+                        prices[name] = float(dec)
+                except (TypeError, ValueError):
+                    continue
+            if len(prices) != 2:
+                continue
+            (na, da), (nb, db) = prices.items()
+            out.append({"team_a": na, "team_b": nb, "odd_a": da, "odd_b": db})
+    return out
+
+
+class BovadaClient:
+    """Keyless betting-odds source — Bovada's public coupon JSON (no API key).
+
+    Bovada exposes an undocumented but stable JSON feed under
+    /services/sports/event/coupon/. We read the CS2 esports coupon, keep each
+    match's full-match Moneyline, and de-vig the decimal prices into fair win
+    probabilities. Best-effort: any network/parse failure returns [] and the
+    engine falls back to ratings. Probability signal only — no real-money betting.
+    """
+
+    provider = "bovada"
+    keyless = True
+    URL = (
+        "https://www.bovada.lv/services/sports/event/coupon/events/A/"
+        "description/esports/counter-strike-2"
+    )
+
+    def __init__(self):
+        self.cache = JsonCache("odds", ttl_seconds=1800)
+        self.headers = {"User-Agent": settings.odds_user_agent, "Accept": "application/json"}
+
+    @property
+    def enabled(self) -> bool:
+        return True  # keyless
+
+    def fetch_fixtures(self, tournament: str = "IEM Cologne") -> list[dict]:
+        cache_key = f"bovada:{slugify_tournament(tournament)}"
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            return cached
+        try:
+            resp = httpx.get(self.URL, headers=self.headers, timeout=20.0)
+            resp.raise_for_status()
+            fixtures = parse_bovada_events(resp.json(), tournament)
+        except (httpx.HTTPError, ValueError, KeyError):
+            return []
+        if fixtures:
+            self.cache.set(cache_key, fixtures)
+        return fixtures
+
+
+def make_odds_client(provider: str | None = None):
+    """Return the configured odds client (default: keyless Bovada); None if disabled."""
+    p = (provider or settings.odds_provider or "").lower()
+    if p in ("", "none"):
+        return None
+    if p == "oddspapi":
+        return OddsClient(provider="oddspapi")
+    return BovadaClient()

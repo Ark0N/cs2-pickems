@@ -6,9 +6,19 @@ import { ProbTable } from "./components/ProbTable";
 import { Recommendation } from "./components/Recommendation";
 import { TeamStrengthEditor } from "./components/TeamStrengthEditor";
 import { Warnings } from "./components/Warnings";
-import type { AnalyzeResponse, MatchResultIn, TeamInfo } from "./types";
+import type { AnalyzeResponse, MatchResultIn, OddsSource, TeamInfo } from "./types";
 
 type Tab = "swiss" | "playoffs";
+
+function oddsSummary(o: OddsSource): string {
+  if (!o.requested) return "off";
+  const tag = o.keyless ? " (keyless)" : "";
+  if (o.applied_matchups > 0) {
+    const n = o.applied_matchups;
+    return `${o.provider}${tag} · ${n} matchup${n === 1 ? "" : "s"} applied`;
+  }
+  return `${o.provider}${tag} · none applied yet`;
+}
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("swiss");
@@ -119,15 +129,40 @@ export default function App() {
               <input type="checkbox" checked={useValve} onChange={(e) => setUseValve(e.target.checked)} />
               Valve VRS ratings (free)
             </label>
-            <label className="check">
-              <input type="checkbox" checked={useHltv} onChange={(e) => setUseHltv(e.target.checked)} />
+            <label
+              className={`check${useValve ? " disabled" : ""}`}
+              title={useValve ? "Valve VRS has priority — turn it off to use HLTV" : ""}
+            >
+              <input
+                type="checkbox"
+                checked={useHltv}
+                disabled={useValve}
+                onChange={(e) => setUseHltv(e.target.checked)}
+              />
               use HLTV ranking
             </label>
             <label className="check">
               <input type="checkbox" checked={useOdds} onChange={(e) => setUseOdds(e.target.checked)} />
-              use betting odds
+              use betting odds (keyless)
             </label>
             <span className="status">{loading ? "simulating…" : data ? `${data.n_sims.toLocaleString()} sims` : ""}</span>
+            {data?.data_sources && (
+              <div className="provenance">
+                <span>
+                  <strong>Ratings:</strong> {data.data_sources.ratings?.label}
+                  {data.data_sources.ratings?.detail ? ` — ${data.data_sources.ratings.detail}` : ""}
+                </span>
+                <span>
+                  <strong>Odds:</strong> {oddsSummary(data.data_sources.odds)}
+                </span>
+                {data.data_sources.ratings?.notes.map((n, i) => (
+                  <span key={`r${i}`} className="note">⚠ {n}</span>
+                ))}
+                {data.data_sources.odds.requested && data.data_sources.odds.note && (
+                  <span className="note">⚠ {data.data_sources.odds.note}</span>
+                )}
+              </div>
+            )}
           </div>
 
           {data && (

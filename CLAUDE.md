@@ -451,6 +451,7 @@ This project may have hooks that auto-format code after writes or validate opera
 |------|-----------------|---------------|-------|
 | 2026-05-25 | Project created | CLAUDE.md | Initial setup |
 | 2026-05-25 | Built full Cologne Major Pick'Em optimizer | backend/**, frontend/** | Swiss Buchholz Monte Carlo sim, optimizer with impossible-3-0 detection, playoffs + cosmetics, hybrid data layer (OddsPapi/HLTV/Liquipedia), FastAPI + React UI. 36 backend tests pass; UI builds & integrates over CORS. Ratings use a seed prior until ODDS_API_KEY/HLTV are wired; team seeds are provisional. |
+| 2026-05-25 | Keyless betting odds + data-source provenance | `data/odds.py`, `data/loader.py`, `config.py`, `models.py`, `service.py`, `cli.py`, `tests/test_data.py`, `frontend/*` | Verified which `/analyze` options actually re-run the sim; found 3 inert toggles. Added a keyless **Bovada** odds provider (now default, no API key) — live IEM Cologne moneylines, de-vigged. `apply_ratings`/`odds_override_probs` return provenance; `/analyze` exposes `data_sources`, UI shows ratings/odds source + notes (HLTV disabled while Valve has priority). 39 tests pass, ruff clean, frontend builds. |
 
 ---
 
@@ -461,8 +462,8 @@ This project may have hooks that auto-format code after writes or validate opera
 **Completion Phrase**: -
 
 ### Pending Tasks
-- [ ] Add `ODDS_API_KEY` to `.env` to enable live betting odds (engine uses a seed-prior
-      rating until then).
+- [x] Betting odds now work **without a key** via the keyless Bovada provider (default).
+      Optional: set `ODDS_API_KEY` + `ODDS_PROVIDER=oddspapi` to use OddsPapi instead.
 - [ ] Refresh provisional team seeds in `backend/app/data/cologne2026.py` from Valve Global
       Standings / Liquipedia before the event.
 - [ ] Confirm official Pick'Em point values in `backend/app/scoring.py` when the in-client

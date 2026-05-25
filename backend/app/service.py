@@ -53,7 +53,8 @@ def run_analysis(
             for t in state.teams
         ]
 
-    probs = build_map_probs(state, odds_override_probs(state, use_odds=use_odds))
+    odds_probs, odds_source = odds_override_probs(state, use_odds=use_odds)
+    probs = build_map_probs(state, odds_probs)
     if matchup_overrides:
         idx = {n: i for i, n in enumerate(state.team_names)}
         for mo in matchup_overrides:
@@ -100,6 +101,7 @@ def run_analysis(
         },
         "warnings": [w.model_dump() for w in warnings],
         "impossible_three_oh_pairs": impossible_three_oh_pairs(sim),
+        "data_sources": {"ratings": state.ratings_source, "odds": odds_source},
     }
 
 

@@ -2,7 +2,7 @@ from app.data.cache import JsonCache
 from app.data.hltv import rank_order_to_ratings
 from app.data.liquipedia import parse_results
 from app.data.loader import build_map_probs, build_stage
-from app.data.odds import fixtures_to_prob_map, normalize_team
+from app.data.odds import fixtures_to_prob_map, normalize_team, parse_bovada_events
 from app.data.valve_standings import parse_global_standings, points_to_ratings
 
 VALVE_SAMPLE = """\
@@ -47,6 +47,56 @@ def test_fixtures_to_prob_map_devigs_and_filters():
     key = frozenset(("Natus Vincere", "Team Vitality"))
     assert abs(pm[key]["Natus Vincere"] - 0.5) < 1e-9
     assert abs(sum(pm[key].values()) - 1.0) < 1e-9
+
+
+def _bovada_event(link, a, b, dec_a, dec_b, period="Game", key="2W-12"):
+    return {
+        "link": link,
+        "competitors": [{"name": a, "home": True}, {"name": b, "home": False}],
+        "displayGroups": [
+            {
+                "description": "Game Lines",
+                "markets": [
+                    {
+                        "description": "Moneyline",
+                        "key": key,
+                        "period": {"description": period},
+                        "outcomes": [
+                            {"description": a, "price": {"decimal": dec_a}},
+                            {"description": b, "price": {"decimal": dec_b}},
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+def test_parse_bovada_events_keeps_match_moneyline_and_filters_tournament():
+    data = [
+        {
+            "path": [],
+            "events": [
+                # match moneyline for the right tournament -> kept
+                _bovada_event("/esports/counter-strike-2/iem-cologne/b8-tyloo-x",
+                              "B8", "Tyloo", "1.645161", "2.200"),
+                # per-map moneyline only -> dropped (no full-match market)
+                _bovada_event("/esports/counter-strike-2/iem-cologne/x-y",
+                              "MOUZ", "NRG", "1.5", "2.5", period="Map 1"),
+                # different tournament -> filtered out by slug
+                _bovada_event("/esports/counter-strike-2/stake-ranked/x-y",
+                              "B8", "NRG", "1.2", "4.0"),
+            ],
+        }
+    ]
+    fx = parse_bovada_events(data, tournament="IEM Cologne")
+    assert len(fx) == 1
+    assert {fx[0]["team_a"], fx[0]["team_b"]} == {"B8", "Tyloo"}
+    # de-vigged: the favourite (lower decimal) gets the higher fair prob, sums to 1
+    pm = fixtures_to_prob_map(fx, {"B8", "Tyloo"})
+    probs = pm[frozenset(("B8", "Tyloo"))]
+    assert probs["B8"] > probs["Tyloo"] > 0
+    assert abs(sum(probs.values()) - 1.0) < 1e-9
 
 
 def test_parse_results_validates_and_normalizes():

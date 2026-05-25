@@ -46,7 +46,8 @@ def main(argv: list[str] | None = None) -> None:
         )
 
     state = build_stage(args.stage, use_hltv=args.use_hltv, use_valve=args.use_valve)
-    probs = build_map_probs(state, odds_override_probs(state, use_odds=args.use_odds))
+    odds_probs, _ = odds_override_probs(state, use_odds=args.use_odds)
+    probs = build_map_probs(state, odds_probs)
     sim = simulate_stage(state, map_probs=probs, n_sims=args.sims, rng_seed=args.seed)
     result = optimize(sim, objective=args.objective, enforce_feasible=not args.allow_impossible)
     print(format_report(sim, result, state, title=f"IEM Cologne Major 2026 — Stage {args.stage}"))

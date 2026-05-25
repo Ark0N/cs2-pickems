@@ -17,7 +17,11 @@ class Settings(BaseSettings):
 
     # Odds provider
     odds_api_key: str = ""
-    odds_provider: str = "oddspapi"  # oddspapi | theoddsapi | none
+    odds_provider: str = "bovada"  # bovada (keyless, default) | oddspapi (needs key) | none
+    odds_user_agent: str = (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+    )
 
     # Liquipedia API politeness
     liquipedia_user_agent: str = "cs2-pickems/0.1 (https://github.com/local)"
