@@ -146,6 +146,23 @@ body {
 }
 .feature svg { width: 14px; height: 14px; color: var(--accent); flex: none; }
 
+/* swiss stage selector */
+.stage-tabs { display: flex; margin-bottom: 16px; }
+
+/* cascade assumption note (stages 2 & 3) */
+.cascade-note {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.cascade-note strong { color: var(--text); }
+.cascade-list { margin-top: 6px; font-size: 12px; }
+.cascade-list span { color: var(--accent); font-weight: 600; margin-right: 4px; }
+
 /* ----------------------------------------------------------- cards */
 .card {
   position: relative;

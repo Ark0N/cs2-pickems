@@ -97,16 +97,20 @@ export interface AnalyzeRequest {
   use_odds: boolean;
   results: MatchResultIn[];
   rating_overrides: Record<string, number>;
+  auto_cascade?: boolean;
 }
 
 export interface AnalyzeResponse {
   stage: number;
+  stage_label: string;
   n_sims: number;
   teams: TeamInfo[];
   standings: Standing[];
   current_round: Match[] | null;
   complete: boolean;
   team_probs: TeamProb[];
+  expected_advancers: string[];
+  assumed_advancers: { stage1?: string[]; stage2?: string[] };
   recommendation: Recommendation;
   warnings: Warning[];
   impossible_three_oh_pairs: [string, string][];

@@ -92,9 +92,16 @@ npm run dev          # open http://localhost:5173
 **Terminal report (no UI):**
 ```bash
 cd backend
-uv run python -m app.cli --stage 1 --sims 50000          # offline (seed-prior ratings)
-uv run python -m app.cli --stage 1 --use-odds --use-hltv # live odds + HLTV ratings
+uv run python -m app.cli --stage 1 --sims 50000          # one stage, offline (seed prior)
+uv run python -m app.cli --stage all --use-valve         # all 3 Swiss stages + playoff champ
+uv run python -m app.cli --stage 2 --use-odds --use-hltv # live odds + HLTV ratings
 ```
+
+`--stage all` (or the `POST /pickem` endpoint) returns the **complete challenge**: one
+optimal entry per Swiss stage plus the playoff champion. Stages 2 and 3 have no fixed
+field, so before results exist the engine cascades each stage's *expected* top 8 into the
+next (Stage 3's expected top 8 become the playoff field). In the web UI, the **Stage 1 ·
+Challengers / Stage 2 · Legends / Stage 3 · Champions** selector switches between them.
 
 **Tests / lint:**
 ```bash
@@ -132,7 +139,9 @@ shows it (e.g. "Ratings: Valve VRS — 15/16 matched · Odds: bovada (keyless) �
    against majors.im / HLTV's Swiss simulator, then submit in the Valve client.
 2. **As results come in:** click winners in the **Live bracket** (or pass `--results` /
    the API). Standings, probabilities, picks, and impossible-combo warnings all refresh.
-   Stage 2 and Stage 3 picks open as the prior stage finishes.
+   Stage 2 and Stage 3 picks are available immediately (cascaded from each stage's expected
+   advancers) and sharpen as the prior stage's real results are entered — switch stages with
+   the selector, or use `--stage all` / `POST /pickem` for the whole challenge at once.
 3. **Before playoffs:** open the **Playoffs** tab for champion/finalist probabilities and
    the champion pick.
 4. **Cosmetics:** submit the MVP suggestion; treat skin/map picks as editable meta guesses.

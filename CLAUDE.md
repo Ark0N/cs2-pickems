@@ -1,4 +1,6 @@
-# CLAUDE.md - Project Configuration
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Setup
 Copy these files to your new project:
@@ -18,7 +20,7 @@ Then update the Project Overview section below.
   must meet can't both go 3-0). Also covers the playoff bracket and cosmetic picks.
 - **Tech Stack**: Python 3.11+ · FastAPI · NumPy/Pandas · httpx · pydantic · pytest/ruff
   (backend); Vite + React + TypeScript (frontend); `uv` for Python env management.
-- **Last Updated**: 2026-05-25
+- **Last Updated**: 2026-05-26
 
 ### Layout & commands
 - `backend/app/` — engine: `ratings` → `swiss` (Buchholz) → `simulate` (Monte Carlo) →
@@ -30,8 +32,9 @@ Then update the Project Overview section below.
   `cd frontend && npm install && npm run dev` (http://localhost:5173).
 - Test/lint: `cd backend && uv run pytest -q && uv run ruff check .` (autofix: `ruff check --fix .`).
 - One test: `uv run pytest tests/test_swiss.py -q` (file) or `uv run pytest -k impossible -q` (by name).
-- Terminal report (no UI, stage 1 only): `uv run python -m app.cli --stage 1 --sims 50000`
-  (add `--use-valve` / `--use-odds` / `--use-hltv`, `--objective ev`, `--allow-impossible`).
+- Terminal report (no UI): `uv run python -m app.cli --stage 1 --sims 50000`; `--stage all`
+  prints every Swiss stage + the playoff champion (also `--stage 2|3`). Add `--use-valve` /
+  `--use-odds` / `--use-hltv`, `--objective ev`, `--allow-impossible`.
 - Frontend typecheck/build: `cd frontend && npm run build` (`tsc -b && vite build`; no separate linter).
 - Use `uv --directory backend run ...` if the shell's working dir isn't `backend/`.
 
@@ -42,9 +45,9 @@ Engine pipeline (each stage consumes the previous one's output):
 **`optimizer`** + **`feasibility`**; plus **`playoffs`** and **`cosmetics`**.
 
 Things that only make sense after reading several files:
-- **Layering.** All business logic lives in `service.py` (`run_analysis`, `run_playoffs`).
-  `main.py` (FastAPI) and `cli.py` are thin wrappers over it — add logic in `service.py`,
-  not in route handlers. `report.py` formats the CLI text output.
+- **Layering.** All business logic lives in `service.py` (`run_analysis`, `run_full_pickem`,
+  `run_playoffs`). `main.py` (FastAPI) and `cli.py` are thin wrappers over it — add logic in
+  `service.py`, not in route handlers. `report.py` formats the service-output dicts as CLI text.
 - **Joint samples are the core idea.** `simulate.simulate_stage` returns not just marginals
   (`p_advance`, `p_three_oh`, `p_zero_three`) but the full per-sim boolean matrices
   (`s_advance`, `s_three_oh`, `s_zero_three`, shape `(n_sims, n)`). Pairwise feasibility is
@@ -70,16 +73,25 @@ Things that only make sense after reading several files:
   (`bo3_all`). `ratings.series_win_prob` inflates a per-map prob to Bo3/Bo5. Known
   `MatchResult`s are applied deterministically, which is how a stage resumes mid-event.
 - **Stage cascade.** Only Stage 1 has a fixed 16-team field. Stages 2/3 are built from the
-  previous stage's 8 advancers, so callers must pass `stage1_advancers`/`stage2_advancers`
-  (16 teams total or `run_analysis` raises). This is why `/teams/{stage}` and the CLI only
-  accept stage 1.
+  previous stage's 8 advancers. Callers may pass `stage1_advancers`/`stage2_advancers`
+  explicitly; otherwise `run_analysis(stage=2|3)` **auto-cascades** (default) — it simulates
+  the earlier stages and feeds each one's *expected* top 8 (`service.expected_advancers`)
+  forward, so any stage is pickable pre-event. `assumed_advancers` in the response records
+  what was inferred. `run_full_pickem` chains all three stages + the playoff champion in one
+  call (CLI `--stage all`, `POST /pickem`); it cascades explicitly (`auto_cascade=False`) so
+  each link is the real prior stage. `/teams/{stage}` still serves only stage 1 — later
+  stages' fields come back inside the `/analyze` response. With `auto_cascade=False` and no
+  advancers supplied, `run_analysis` raises (field ≠ 16).
 - **Optimizer objectives** (`optimizer.py`): `category` (default — best candidates per slot,
   intuitive) vs `ev` (global expected-points max); both feasibility-constrained by default.
   `scoring.ScoreWeights` defaults to 1/1/1 (maximize expected *correct* picks) and is the
   knob for real in-client point values once known.
 - **Frontend** (`frontend/src/App.tsx`): single-page React; edits to controls/overrides
-  debounce (350 ms) and re-`POST /analyze`. API base is the page's host on `:8000`
-  (override `VITE_API_BASE`). `/analyze` responses are LRU-cached server-side by request hash.
+  debounce (350 ms) and re-`POST /analyze`. A Stage 1/2/3 selector switches the analysed
+  stage (results are tracked per stage in `resultsByStage`); the strength editor and tables
+  read the field from the `/analyze` response. API base is the page's host on `:8000`
+  (override `VITE_API_BASE`). `/analyze` + `/pickem` responses are LRU-cached server-side by
+  request hash.
 
 ---
 
@@ -504,6 +516,7 @@ This project may have hooks that auto-format code after writes or validate opera
 | 2026-05-25 | Built full Cologne Major Pick'Em optimizer | backend/**, frontend/** | Swiss Buchholz Monte Carlo sim, optimizer with impossible-3-0 detection, playoffs + cosmetics, hybrid data layer (OddsPapi/HLTV/Liquipedia), FastAPI + React UI. 36 backend tests pass; UI builds & integrates over CORS. Ratings use a seed prior until ODDS_API_KEY/HLTV are wired; team seeds are provisional. |
 | 2026-05-25 | Keyless betting odds + data-source provenance | `data/odds.py`, `data/loader.py`, `config.py`, `models.py`, `service.py`, `cli.py`, `tests/test_data.py`, `frontend/*` | Verified which `/analyze` options actually re-run the sim; found 3 inert toggles. Added a keyless **Bovada** odds provider (now default, no API key) — live IEM Cologne moneylines, de-vigged. `apply_ratings`/`odds_override_probs` return provenance; `/analyze` exposes `data_sources`, UI shows ratings/odds source + notes (HLTV disabled while Valve has priority). 39 tests pass, ruff clean, frontend builds. |
 | 2026-05-26 | `/init` — documented architecture | `CLAUDE.md` | Added a "big picture" architecture subsection (service/main layering, joint-sample feasibility, hot-path vs pydantic split, ratings priority, Swiss Bo3 rules, stage cascade, optimizer objectives, frontend). Added single-test, ruff-autofix, CLI-report, and frontend-build commands. No code changes. |
+| 2026-05-26 | Multi-stage Pick'Em (all 3 Swiss stages + cascade) | `service.py`, `main.py`, `cli.py`, `report.py`, `frontend/*`, `tests/test_full_pickem.py` | Stages 2/3 now optimize end-to-end: `run_analysis` **auto-cascades** the expected top 8 from earlier stages (or takes explicit advancers); new `run_full_pickem` chains all three stages + playoff champion. Exposed via `POST /pickem`, CLI `--stage all`/`2`/`3`, and a Stage 1/2/3 selector in the UI (per-stage results, cascade note). `report.py` reworked to format service dicts. 47 tests pass (8 new), ruff clean, frontend builds. |
 
 ---
 
@@ -516,6 +529,8 @@ This project may have hooks that auto-format code after writes or validate opera
 ### Pending Tasks
 - [x] Betting odds now work **without a key** via the keyless Bovada provider (default).
       Optional: set `ODDS_API_KEY` + `ODDS_PROVIDER=oddspapi` to use OddsPapi instead.
+- [x] All three Swiss stages are now optimized (stages 2/3 auto-cascade from earlier-stage
+      expected advancers). Use `--stage all` / `POST /pickem` for the complete challenge.
 - [ ] Refresh provisional team seeds in `backend/app/data/cologne2026.py` from Valve Global
       Standings / Liquipedia before the event.
 - [ ] Confirm official Pick'Em point values in `backend/app/scoring.py` when the in-client

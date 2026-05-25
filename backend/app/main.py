@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from app.data.loader import build_stage
 from app.models import MatchResult
-from app.service import run_analysis, run_playoffs
+from app.service import run_analysis, run_full_pickem, run_playoffs
 
 app = FastAPI(title="CS2 Cologne Major 2026 Pick'Em Optimizer", version="0.1.0")
 
@@ -57,6 +57,23 @@ class AnalyzeRequest(BaseModel):
     matchup_overrides: list[MatchupOverrideIn] = []
     stage1_advancers: list[str] = []
     stage2_advancers: list[str] = []
+    # For stage 2/3, infer the previous stages' expected advancers when not supplied.
+    auto_cascade: bool = True
+    rng_seed: int = 0
+
+
+class PickemRequest(BaseModel):
+    """One optimal entry per Swiss stage (1-3) + the playoff champion, cascaded."""
+
+    n_sims: int = Field(default=20_000, ge=1_000, le=MAX_SIMS)
+    objective: str = "category"
+    enforce_feasible: bool = True
+    use_hltv: bool = False
+    use_valve: bool = False
+    use_odds: bool = False
+    rating_overrides: dict[str, float] = {}
+    include_playoffs: bool = True
+    playoff_sims: int = Field(default=30_000, ge=1_000, le=MAX_SIMS)
     rng_seed: int = 0
 
 
@@ -108,6 +125,32 @@ def analyze(req: AnalyzeRequest):
             matchup_overrides=[m.model_dump() for m in req.matchup_overrides],
             stage1_advancers=req.stage1_advancers,
             stage2_advancers=req.stage2_advancers,
+            auto_cascade=req.auto_cascade,
+            rng_seed=req.rng_seed,
+        )
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    _cache[key] = out
+    return out
+
+
+@app.post("/pickem")
+def pickem(req: PickemRequest):
+    """Full multi-stage Pick'Em (all three Swiss stages + playoff champion)."""
+    key = "pickem:" + hashlib.sha1(req.model_dump_json().encode()).hexdigest()
+    if key in _cache:
+        return _cache[key]
+    try:
+        out = run_full_pickem(
+            n_sims=req.n_sims,
+            objective=req.objective,
+            enforce_feasible=req.enforce_feasible,
+            use_hltv=req.use_hltv,
+            use_valve=req.use_valve,
+            use_odds=req.use_odds,
+            rating_overrides=req.rating_overrides,
+            include_playoffs=req.include_playoffs,
+            playoff_sims=req.playoff_sims,
             rng_seed=req.rng_seed,
         )
     except ValueError as e:

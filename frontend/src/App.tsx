@@ -9,6 +9,15 @@ import { Warnings } from "./components/Warnings";
 import type { AnalyzeResponse, MatchResultIn, OddsSource, TeamInfo } from "./types";
 
 type Tab = "swiss" | "playoffs";
+type Stage = 1 | 2 | 3;
+
+const STAGES: { id: Stage; label: string }[] = [
+  { id: 1, label: "Stage 1 · Challengers" },
+  { id: 2, label: "Stage 2 · Legends" },
+  { id: 3, label: "Stage 3 · Champions" },
+];
+
+const NO_RESULTS: MatchResultIn[] = [];
 
 function oddsSummary(o: OddsSource): string {
   if (!o.requested) return "off";
@@ -45,9 +54,11 @@ function CheckIcon() {
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("swiss");
+  const [stage, setStage] = useState<Stage>(1);
   const [teams, setTeams] = useState<TeamInfo[]>([]);
   const [overrides, setOverrides] = useState<Record<string, number>>({});
-  const [results, setResults] = useState<MatchResultIn[]>([]);
+  // Results are tracked per stage — each Swiss stage has its own field & bracket.
+  const [resultsByStage, setResultsByStage] = useState<Record<number, MatchResultIn[]>>({});
   const [nSims, setNSims] = useState(100000);
   const [objective, setObjective] = useState<"category" | "ev">("category");
   const [enforceFeasible, setEnforceFeasible] = useState(true);
@@ -64,10 +75,12 @@ export default function App() {
     getTeams(1).then(setTeams).catch((e) => setError(String(e)));
   }, []);
 
+  const results = resultsByStage[stage] ?? NO_RESULTS;
+
   const run = useCallback(() => {
     setLoading(true);
     analyze({
-      stage: 1,
+      stage,
       n_sims: nSims,
       objective,
       enforce_feasible: enforceFeasible,
@@ -83,7 +96,7 @@ export default function App() {
       })
       .catch((e) => setError(String(e)))
       .finally(() => setLoading(false));
-  }, [nSims, objective, enforceFeasible, useHltv, useValve, useOdds, results, overrides]);
+  }, [stage, nSims, objective, enforceFeasible, useHltv, useValve, useOdds, results, overrides]);
 
   // debounce re-analysis when inputs change
   useEffect(() => {
@@ -94,13 +107,16 @@ export default function App() {
   }, [run, teams.length]);
 
   const setWinner = (a: string, b: string, winner: string) => {
-    setResults((prev) => {
-      const rest = prev.filter(
+    setResultsByStage((prev) => {
+      const cur = prev[stage] ?? [];
+      const rest = cur.filter(
         (r) => !((r.team_a === a && r.team_b === b) || (r.team_a === b && r.team_b === a))
       );
-      return [...rest, { team_a: a, team_b: b, winner }];
+      return { ...prev, [stage]: [...rest, { team_a: a, team_b: b, winner }] };
     });
   };
+
+  const clearResults = () => setResultsByStage((prev) => ({ ...prev, [stage]: [] }));
 
   const ds = data?.data_sources;
 
@@ -154,6 +170,36 @@ export default function App() {
         <Playoffs />
       ) : (
         <>
+          <nav className="tabs stage-tabs" aria-label="Swiss stage">
+            {STAGES.map((s) => (
+              <button
+                key={s.id}
+                className={stage === s.id ? "active" : ""}
+                onClick={() => setStage(s.id)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </nav>
+
+          {data && stage > 1 && data.assumed_advancers && (
+            <div className="cascade-note">
+              <strong>Stage {stage} field</strong> assumes the model's expected advancers from
+              earlier stages (no results entered yet). Enter Stage&nbsp;
+              {stage - 1} results to refine.
+              {data.assumed_advancers.stage1 && (
+                <div className="cascade-list">
+                  <span>from Stage 1:</span> {data.assumed_advancers.stage1.join(", ")}
+                </div>
+              )}
+              {data.assumed_advancers.stage2 && (
+                <div className="cascade-list">
+                  <span>from Stage 2:</span> {data.assumed_advancers.stage2.join(", ")}
+                </div>
+              )}
+            </div>
+          )}
+
           <section className="card controls">
             <div className="controls-head">
               <h2>Simulation</h2>
@@ -276,15 +322,15 @@ export default function App() {
                   currentRound={data.current_round}
                   results={results}
                   onSetWinner={setWinner}
-                  onClear={() => setResults([])}
+                  onClear={clearResults}
                 />
               </div>
             </>
           )}
 
-          {teams.length > 0 && (
+          {(data?.teams ?? teams).length > 0 && (
             <TeamStrengthEditor
-              teams={teams}
+              teams={data?.teams ?? teams}
               overrides={overrides}
               onChange={(t, r) => setOverrides((p) => ({ ...p, [t]: r }))}
               onReset={() => setOverrides({})}
