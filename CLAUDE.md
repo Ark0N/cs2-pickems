@@ -16,14 +16,15 @@ Then update the Project Overview section below.
   stages under Valve's Buchholz pairing (Monte Carlo), recommends the optimal 10 picks
   (2× 3-0, 2× 0-3, 6× advance), and flags **impossible combinations** (two teams that
   must meet can't both go 3-0). Also covers the playoff bracket and cosmetic picks.
-- **Tech Stack**: Python 3.12 · FastAPI · NumPy/Pandas · httpx · pydantic · pytest/ruff
+- **Tech Stack**: Python 3.11+ · FastAPI · NumPy/Pandas · httpx · pydantic · pytest/ruff
   (backend); Vite + React + TypeScript (frontend); `uv` for Python env management.
 - **Last Updated**: 2026-05-25
 
 ### Layout & commands
 - `backend/app/` — engine: `ratings` → `swiss` (Buchholz) → `simulate` (Monte Carlo) →
-  `optimizer` + `feasibility`; plus `playoffs`, `cosmetics`, `data/` (odds/HLTV/Liquipedia
-  + `loader`), `service.py`, `main.py` (FastAPI). `cli.py` for terminal reports.
+  `optimizer` + `feasibility`; plus `playoffs`, `cosmetics`, `data/` (sources
+  `valve_standings`/`odds`/`hltv`/`liquipedia` + `cache` + `loader` assembler +
+  `cologne2026` roster/seeds), `service.py`, `main.py` (FastAPI). `cli.py` for terminal reports.
 - `frontend/src/` — React UI (`App.tsx` + `components/`) over the API.
 - Run: `cd backend && uv sync --extra dev && uv run uvicorn app.main:app --reload`, then
   `cd frontend && npm install && npm run dev` (http://localhost:5173).
@@ -59,6 +60,11 @@ Things that only make sense after reading several files:
   *per-matchup* win probs on top of ratings (`odds_override_probs` → `build_map_probs`).
   Everything works fully offline on the transparent seed prior. Both functions return a
   provenance dict surfaced to the UI as `data_sources`.
+- **Offline resilience via cache.** Every network source (Valve VRS, HLTV, odds) reads
+  through `data/cache.py` (`JsonCache` — TTL'd JSON under `data/cache/<namespace>/`). Stored
+  snapshots (e.g. `data/cache/valve/global.json`, `bovada_iem-cologne.json`) let runs work
+  against the last fetch when offline or rate-limited; the cache also keeps HLTV scraping
+  polite (Cloudflare-protected) and the keyed odds budget low.
 - **Swiss rules** (`swiss.py`): a match is **Bo3** only when it would decide a team's
   advancement (3rd win) or elimination (3rd loss) — else Bo1; Stage 3 is all Bo3
   (`bo3_all`). `ratings.series_win_prob` inflates a per-map prob to Bo3/Bo5. Known
