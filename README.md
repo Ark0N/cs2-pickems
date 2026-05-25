@@ -14,18 +14,29 @@ stage to the playoff bracket and the cosmetic picks, all delivered through a cle
 web app.
 
 ## The Picks
-**Stage 1** 
-IEM Cologne 2026 (Valve VRS ratings + live keyless odds, 100k Monte Carlo sims):
+All three Swiss stages are optimized (Valve VRS ratings, 100k Monte Carlo sims each).
+
+**Stage 1 · Challengers** — the locked 16-team field:
 
 ![Stage 1 Pick'Em recommendation — 2× 3-0, 6× advance, 2× 0-3](docs/screenshots/cs2-pickem-cologne-stage1.png)
+
+**Stage 2 · Legends** — the 8 Legends invites + Stage 1's projected top 8 (cascaded):
+
+![Stage 2 Pick'Em recommendation](docs/screenshots/cs2-pickem-cologne-stage2.png)
+
+**Stage 3 · Champions** — the 8 Champions invites + Stage 2's projected top 8 (all Bo3):
+
+![Stage 3 Pick'Em recommendation](docs/screenshots/cs2-pickem-cologne-stage3.png)
 
 And the playoff **champion** pick:
 
 ![Major champion pick](docs/screenshots/cs2-pickem-cologne-champion.png)
 
-> Generated mockups styled after the in-game screen (not affiliated with Valve).
-> Team seeds are provisional — re-run before the stage locks. Regenerate by opening
-> [`docs/pickem_mockup.html`](docs/pickem_mockup.html) in a browser and screenshotting.
+> Generated mockups styled after the in-game screen (not affiliated with Valve). Stages 2 & 3
+> are **projected** — their fields cascade from each earlier stage's expected top 8 and sharpen
+> as real results come in. Team seeds are provisional. Regenerate by opening
+> [`docs/pickem_mockup.html`](docs/pickem_mockup.html) in a browser and screenshotting each
+> `.frame` (`#stage1`/`#stage2`/`#stage3`/`#champion`).
 
 ## The live web app
 

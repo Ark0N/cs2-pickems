@@ -38,6 +38,8 @@
   .stage .v{ font-size:19px; font-weight:800; color:var(--text); margin-top:3px; }
   .lock{ display:inline-block; margin-left:8px; font-size:12px; color:var(--green);
          border:1px solid rgba(63,178,127,.4); border-radius:20px; padding:2px 9px; vertical-align:middle; }
+  .proj{ display:inline-block; margin-left:8px; font-size:12px; color:var(--blue);
+         border:1px solid rgba(79,157,222,.4); border-radius:20px; padding:2px 9px; vertical-align:middle; }
 
   .group{ margin-top:22px; position:relative; z-index:1; }
   .ghead{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
@@ -85,6 +87,11 @@
   .sub{ font-size:11px; color:var(--muted); margin-top:3px; }
 
   .note{ margin-top:10px; font-size:11.5px; color:var(--muted); }
+  .cascade{
+    margin-top:16px; font-size:12px; color:var(--muted); position:relative; z-index:1;
+    background:rgba(79,157,222,.06); border:1px dashed #2d6c92; border-radius:10px; padding:11px 15px;
+  }
+  .cascade b{ color:var(--blue); }
   .foot{
     margin-top:24px; padding-top:14px; border-top:1px solid var(--line);
     display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#6f8294;
@@ -145,7 +152,7 @@
         <div class="meta">
           <div class="name">GamerLegion</div><div class="seed">Seed 1</div>
           <div class="stat"><span class="pct">31%</span><span class="plabel">to go 3-0</span></div>
-          <div class="sub">82% to advance · model's #1 team</div>
+          <div class="sub">85% to advance · model's #1 team</div>
         </div>
       </div>
       <div class="card g30 sel">
@@ -154,7 +161,7 @@
         <div class="meta">
           <div class="name">B8</div><div class="seed">Seed 2</div>
           <div class="stat"><span class="pct">27%</span><span class="plabel">to go 3-0</span></div>
-          <div class="sub">81% to advance</div>
+          <div class="sub">82% to advance</div>
         </div>
       </div>
     </div>
@@ -171,11 +178,11 @@
       <div class="card adv sel"><div class="tick">✓</div>
         <div class="logo" style="background:linear-gradient(145deg,#3f86c9,#234f74)">HER</div>
         <div class="meta"><div class="name">HEROIC</div>
-          <div class="stat"><span class="pct">73%</span><span class="plabel">advance</span></div></div></div>
+          <div class="stat"><span class="pct">74%</span><span class="plabel">advance</span></div></div></div>
       <div class="card adv sel"><div class="tick">✓</div>
         <div class="logo" style="background:linear-gradient(145deg,#ffd23f,#caa033)">BB</div>
         <div class="meta"><div class="name">BetBoom Team</div>
-          <div class="stat"><span class="pct">71%</span><span class="plabel">advance</span></div></div></div>
+          <div class="stat"><span class="pct">72%</span><span class="plabel">advance</span></div></div></div>
       <div class="card adv sel"><div class="tick">✓</div>
         <div class="logo" style="background:linear-gradient(145deg,#e05a5a,#9c2f2a)">MIBR</div>
         <div class="meta"><div class="name">MIBR</div>
@@ -183,15 +190,15 @@
       <div class="card adv sel"><div class="tick">✓</div>
         <div class="logo" style="background:linear-gradient(145deg,#8a9bab,#566472)">BIG</div>
         <div class="meta"><div class="name">BIG</div>
-          <div class="stat"><span class="pct">66%</span><span class="plabel">advance</span></div></div></div>
-      <div class="card adv sel"><div class="tick">✓</div>
-        <div class="logo" style="background:linear-gradient(145deg,#3fb27f,#247a55)">M80</div>
-        <div class="meta"><div class="name">M80</div>
-          <div class="stat"><span class="pct">64%</span><span class="plabel">advance</span></div></div></div>
+          <div class="stat"><span class="pct">67%</span><span class="plabel">advance</span></div></div></div>
       <div class="card adv sel"><div class="tick">✓</div>
         <div class="logo" style="background:linear-gradient(145deg,#d35454,#8c2f2f)">SIN</div>
         <div class="meta"><div class="name">SINNERS Esports</div>
-          <div class="stat"><span class="pct">57%</span><span class="plabel">advance</span></div></div></div>
+          <div class="stat"><span class="pct">63%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#3fb27f,#247a55)">M80</div>
+        <div class="meta"><div class="name">M80</div>
+          <div class="stat"><span class="pct">63%</span><span class="plabel">advance</span></div></div></div>
     </div>
   </div>
 
@@ -204,20 +211,245 @@
     </div>
     <div class="row two">
       <div class="card g03 sel"><div class="tick">✗</div>
-        <div class="logo" style="background:linear-gradient(145deg,#3a4a9c,#222d6b)">TDU</div>
-        <div class="meta"><div class="name">THUNDERdOWNUNDER</div><div class="seed">Seed 15</div>
-          <div class="stat"><span class="pct">60%</span><span class="plabel">to go 0-3</span></div>
-          <div class="sub">weakest team in the field</div></div></div>
-      <div class="card g03 sel"><div class="tick">✗</div>
         <div class="logo" style="background:linear-gradient(145deg,#2b3a8c,#19245c)">NRG</div>
-        <div class="meta"><div class="name">NRG</div><div class="seed">Seed 9</div>
-          <div class="stat"><span class="pct">47%</span><span class="plabel">to go 0-3</span></div>
-          <div class="sub">2nd-likeliest to whiff</div></div></div>
+        <div class="meta"><div class="name">NRG</div><div class="seed">Seed 15</div>
+          <div class="stat"><span class="pct">73%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">model's likeliest whiff</div></div></div>
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#3a4a9c,#222d6b)">TDU</div>
+        <div class="meta"><div class="name">THUNDERdOWNUNDER</div><div class="seed">Seed 16</div>
+          <div class="stat"><span class="pct">69%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">lowest seed in the field</div></div></div>
     </div>
   </div>
 
   <div class="foot">
-    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings + live odds (Bovada) · Monte Carlo 100k sims · objective: category</span>
+    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings · Monte Carlo 100k sims · objective: category</span>
+    <span>Unofficial mockup — not affiliated with Valve</span>
+  </div>
+</div>
+
+<!-- ===================== STAGE 2 (LEGENDS) ===================== -->
+<div class="frame" id="stage2">
+  <div class="top">
+    <div class="brand">
+      <div class="emblem">IEM<br>2026</div>
+      <div>
+        <div class="evt">IEM COLOGNE MAJOR 2026</div>
+        <div class="title">PICK'EM CHALLENGE</div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="k">STAGE 2 · SWISS</div>
+      <div class="v">LEGENDS <span class="proj">⟳ PROJECTED</span></div>
+    </div>
+  </div>
+
+  <!-- 3-0 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-30">★ 3-0 FLAWLESS</span>
+      <span class="desc">Pick 2 teams to win all 3 with no losses</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e07b39,#a8531f)">FUT</div>
+        <div class="meta">
+          <div class="name">FUT Esports</div><div class="seed">Seed 1</div>
+          <div class="stat"><span class="pct">30%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">83% to advance · top Legends seed</div>
+        </div>
+      </div>
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e8453c,#9c2a23)">AST</div>
+        <div class="meta">
+          <div class="name">Astralis</div><div class="seed">Seed 3</div>
+          <div class="stat"><span class="pct">30%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">83% to advance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVANCE -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-adv">✓ ADVANCE · 3 WINS</span>
+      <span class="desc">Teams reaching the next stage (your two 3-0 picks also advance → 8 total)</span>
+      <span class="count">6 / 6 selected</span>
+    </div>
+    <div class="row six">
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#f2c14e,#c79a2c)">SPR</div>
+        <div class="meta"><div class="name">Team Spirit</div>
+          <div class="stat"><span class="pct">83%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#c9ccd1,#8f949c)">G2</div>
+        <div class="meta"><div class="name">G2 Esports</div>
+          <div class="stat"><span class="pct">70%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#2ea36b,#1c6e47)">LGC</div>
+        <div class="meta"><div class="name">Legacy</div>
+          <div class="stat"><span class="pct">57%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e0564c,#9c2f2a)">GL</div>
+        <div class="meta"><div class="name">GamerLegion</div>
+          <div class="stat"><span class="pct">53%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#6fa8dc,#3f6f99)">MON</div>
+        <div class="meta"><div class="name">Monte</div>
+          <div class="stat"><span class="pct">53%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#d2517a,#963655)">PN</div>
+        <div class="meta"><div class="name">paiN Gaming</div>
+          <div class="stat"><span class="pct">52%</span><span class="plabel">advance</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- 0-3 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-03">✗ 0-3 ELIMINATED</span>
+      <span class="desc">Pick 2 teams to lose all 3 with no wins</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#b07cc6,#7a4a90)">9Z</div>
+        <div class="meta"><div class="name">9z Team</div><div class="seed">Seed 8</div>
+          <div class="stat"><span class="pct">71%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">weakest invite by VRS</div></div></div>
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#d35454,#8c2f2f)">SIN</div>
+        <div class="meta"><div class="name">SINNERS Esports</div><div class="seed">Seed 15</div>
+          <div class="stat"><span class="pct">19%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">lowest Stage-1 carry-over</div></div></div>
+    </div>
+  </div>
+
+  <div class="cascade">
+    <b>Projected field.</b> Stage 2 = the 8 Legends-stage invites + Stage 1's expected top 8
+    (GamerLegion, B8, HEROIC, BetBoom, MIBR, BIG, SINNERS, M80). Picks re-sharpen the moment
+    real Stage 1 results are entered.
+  </div>
+
+  <div class="foot">
+    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings · Monte Carlo 100k sims · objective: category</span>
+    <span>Unofficial mockup — not affiliated with Valve</span>
+  </div>
+</div>
+
+<!-- ===================== STAGE 3 (CHAMPIONS) ===================== -->
+<div class="frame" id="stage3">
+  <div class="top">
+    <div class="brand">
+      <div class="emblem">IEM<br>2026</div>
+      <div>
+        <div class="evt">IEM COLOGNE MAJOR 2026</div>
+        <div class="title">PICK'EM CHALLENGE</div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="k">STAGE 3 · SWISS (ALL BO3)</div>
+      <div class="v">CHAMPIONS <span class="proj">⟳ PROJECTED</span></div>
+    </div>
+  </div>
+
+  <!-- 3-0 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-30">★ 3-0 FLAWLESS</span>
+      <span class="desc">Pick 2 teams to win all 3 with no losses</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#f4d03f,#c9a52c)">VIT</div>
+        <div class="meta">
+          <div class="name">Team Vitality</div><div class="seed">Seed 1</div>
+          <div class="stat"><span class="pct">76%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">100% to advance · Valve VRS #1, runaway favourite</div>
+        </div>
+      </div>
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#2a2a2a,#050505);color:#fff">NAVI</div>
+        <div class="meta">
+          <div class="name">Natus Vincere</div><div class="seed">Seed 2</div>
+          <div class="stat"><span class="pct">33%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">89% to advance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVANCE -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-adv">✓ ADVANCE · 3 WINS</span>
+      <span class="desc">Top 8 reach the playoffs (your two 3-0 picks also advance → 8 total)</span>
+      <span class="count">6 / 6 selected</span>
+    </div>
+    <div class="row six">
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#2e9e4a,#1b6e2f)">FLC</div>
+        <div class="meta"><div class="name">Team Falcons</div>
+          <div class="stat"><span class="pct">78%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#c9a227,#8a6f15)">MGZ</div>
+        <div class="meta"><div class="name">The MongolZ</div>
+          <div class="stat"><span class="pct">71%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#f2c14e,#c79a2c)">SPR</div>
+        <div class="meta"><div class="name">Team Spirit</div>
+          <div class="stat"><span class="pct">68%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e8453c,#9c2a23)">AST</div>
+        <div class="meta"><div class="name">Astralis</div>
+          <div class="stat"><span class="pct">65%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e07b39,#a8531f)">FUT</div>
+        <div class="meta"><div class="name">FUT Esports</div>
+          <div class="stat"><span class="pct">63%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#4fb0a8,#2e706b)">PARI</div>
+        <div class="meta"><div class="name">PARIVISION</div>
+          <div class="stat"><span class="pct">59%</span><span class="plabel">advance</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- 0-3 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-03">✗ 0-3 ELIMINATED</span>
+      <span class="desc">Pick 2 teams to lose all 3 with no wins</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#d2517a,#963655)">PN</div>
+        <div class="meta"><div class="name">paiN Gaming</div><div class="seed">Seed 16</div>
+          <div class="stat"><span class="pct">50%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">lowest seed in the Champions field</div></div></div>
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#6fa8dc,#3f6f99)">MON</div>
+        <div class="meta"><div class="name">Monte</div><div class="seed">Seed 15</div>
+          <div class="stat"><span class="pct">46%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">weakest Stage-2 carry-over</div></div></div>
+    </div>
+  </div>
+
+  <div class="cascade">
+    <b>Projected field.</b> Stage 3 = the 8 Champions-stage invites + Stage 2's expected top 8
+    (FUT, Astralis, Team Spirit, G2, Legacy, GamerLegion, Monte, paiN). Every match here is Bo3.
+  </div>
+
+  <div class="foot">
+    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings · Monte Carlo 100k sims · objective: category</span>
     <span>Unofficial mockup — not affiliated with Valve</span>
   </div>
 </div>
@@ -251,9 +483,9 @@
       <h4>FIELD — CHAMPION PROBABILITY</h4>
       <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#f4d03f,#c9a52c)">VIT</div>
         <div class="nm">Team Vitality</div><div class="bar"><div class="fill" style="width:100%"></div></div><div class="fp">59%</div></div>
-      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#1f1f1f,#000)">NAVI</div>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#2a2a2a,#050505);color:#fff">NAVI</div>
         <div class="nm">Natus Vincere</div><div class="bar"><div class="fill" style="width:46%"></div></div><div class="fp">27%</div></div>
-      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#2e7d32,#1b4d1f)">FLC</div>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#2e9e4a,#1b6e2f)">FLC</div>
         <div class="nm">Team Falcons</div><div class="bar"><div class="fill" style="width:17%"></div></div><div class="fp">10%</div></div>
       <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#c9a227,#8a6f15)">MGZ</div>
         <div class="nm">The MongolZ</div><div class="bar"><div class="fill" style="width:6%"></div></div><div class="fp">3%</div></div>
