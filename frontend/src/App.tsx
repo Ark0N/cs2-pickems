@@ -12,9 +12,9 @@ type Tab = "swiss" | "playoffs";
 type Stage = 1 | 2 | 3;
 
 const STAGES: { id: Stage; label: string }[] = [
-  { id: 1, label: "Stage 1 · Challengers" },
-  { id: 2, label: "Stage 2 · Legends" },
-  { id: 3, label: "Stage 3 · Champions" },
+  { id: 1, label: "Stage 1 · Opening" },
+  { id: 2, label: "Stage 2 · Challengers" },
+  { id: 3, label: "Stage 3 · Legends" },
 ];
 
 const NO_RESULTS: MatchResultIn[] = [];

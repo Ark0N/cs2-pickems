@@ -27,7 +27,7 @@ def _valid_pick(stage: dict) -> None:
 def test_stage2_autocascades_to_full_field():
     s2 = run_analysis(stage=2, n_sims=SIMS)
     assert len(s2["teams"]) == 16
-    assert s2["stage_label"] == "Legends"
+    assert s2["stage_label"] == "Challengers Stage"
     # Stage 2 = the 8 Stage-2 invites + 8 inferred Stage-1 advancers
     assert "stage1" in s2["assumed_advancers"]
     assert len(s2["assumed_advancers"]["stage1"]) == 8
@@ -39,7 +39,7 @@ def test_stage2_autocascades_to_full_field():
 def test_stage3_autocascades_through_both_prior_stages():
     s3 = run_analysis(stage=3, n_sims=SIMS)
     assert len(s3["teams"]) == 16
-    assert s3["stage_label"] == "Champions"
+    assert s3["stage_label"] == "Legends Stage"
     assert set(s3["assumed_advancers"]) == {"stage1", "stage2"}
     assert len(s3["assumed_advancers"]["stage2"]) == 8
     _valid_pick(s3)
@@ -87,5 +87,9 @@ def test_pickem_endpoint():
     r = client.post("/pickem", json={"n_sims": SIMS, "playoff_sims": SIMS})
     assert r.status_code == 200
     body = r.json()
-    assert [s["stage_label"] for s in body["stages"]] == ["Challengers", "Legends", "Champions"]
+    assert [s["stage_label"] for s in body["stages"]] == [
+        "Opening Stage",
+        "Challengers Stage",
+        "Legends Stage",
+    ]
     assert body["playoffs"]["champion_pick"]

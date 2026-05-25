@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from app.models import Team
 
-# 8 teams seeded directly into Stage 3 (Champions stage), strongest first.
+# 8 teams seeded directly into Stage 3 (Legends stage), strongest first.
 STAGE3_INVITES: list[str] = [
     "Team Vitality",
     "Natus Vincere",

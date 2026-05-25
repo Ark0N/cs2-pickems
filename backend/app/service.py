@@ -18,9 +18,11 @@ from app.simulate import StageSimulation, simulate_stage
 from app.swiss import live_bracket
 
 # Each Swiss stage advances its top 8 into the next stage (Stage 3's top 8 reach
-# the playoffs). The CS2 Major Pick'Em offers one entry per Swiss stage.
+# the playoffs). The CS2 Major Pick'Em offers one entry per Swiss stage. Stage names
+# follow the in-game / HLTV Pick'Em (Opening → Challengers → Legends), not the old
+# Challengers/Legends/Champions naming.
 ADVANCE_SLOTS = 8
-STAGE_LABELS = {1: "Challengers", 2: "Legends", 3: "Champions"}
+STAGE_LABELS = {1: "Opening Stage", 2: "Challengers Stage", 3: "Legends Stage"}
 
 
 def expected_advancers(sim: StageSimulation, k: int = ADVANCE_SLOTS) -> list[str]:

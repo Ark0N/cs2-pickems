@@ -16,15 +16,15 @@ web app.
 ## The Picks
 All three Swiss stages are optimized (Valve VRS ratings, 100k Monte Carlo sims each).
 
-**Stage 1 · Challengers** — the locked 16-team field:
+**Stage 1 · Opening Stage** — the locked 16-team field:
 
 ![Stage 1 Pick'Em recommendation — 2× 3-0, 6× advance, 2× 0-3](docs/screenshots/cs2-pickem-cologne-stage1.png)
 
-**Stage 2 · Legends** — the 8 Legends invites + Stage 1's projected top 8 (cascaded):
+**Stage 2 · Challengers Stage** — the 8 Challengers-stage invites + Stage 1's projected top 8 (cascaded):
 
 ![Stage 2 Pick'Em recommendation](docs/screenshots/cs2-pickem-cologne-stage2.png)
 
-**Stage 3 · Champions** — the 8 Champions invites + Stage 2's projected top 8 (all Bo3):
+**Stage 3 · Legends Stage** — the 8 Legends-stage invites + Stage 2's projected top 8 (all Bo3):
 
 ![Stage 3 Pick'Em recommendation](docs/screenshots/cs2-pickem-cologne-stage3.png)
 
@@ -112,7 +112,7 @@ uv run python -m app.cli --stage 2 --use-odds --use-hltv # live odds + HLTV rati
 optimal entry per Swiss stage plus the playoff champion. Stages 2 and 3 have no fixed
 field, so before results exist the engine cascades each stage's *expected* top 8 into the
 next (Stage 3's expected top 8 become the playoff field). In the web UI, the **Stage 1 ·
-Challengers / Stage 2 · Legends / Stage 3 · Champions** selector switches between them.
+Opening / Stage 2 · Challengers / Stage 3 · Legends** selector switches between them.
 
 **Tests / lint:**
 ```bash
