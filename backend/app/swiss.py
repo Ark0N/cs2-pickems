@@ -233,9 +233,19 @@ def live_bracket(stage_state: StageState) -> dict:
         rounds.append({"round": round_idx + 1, "matches": round_matches})
         round_idx += 1
 
+    # standings reflect ALL known results (even a partially-played round), not just
+    # the fully-completed rounds consumed by the pairing replay above.
+    disp_w = np.zeros(n, dtype=np.int16)
+    disp_l = np.zeros(n, dtype=np.int16)
+    for (i, j), w in prep.known.items():
+        loser = j if w == i else i
+        disp_w[w] += 1
+        disp_l[loser] += 1
     standings = [
-        {"team": prep.names[i], "wins": int(wins[i]), "losses": int(losses[i])}
-        for i in sorted(range(n), key=lambda i: (-int(wins[i]), int(losses[i]), int(prep.seed[i])))
+        {"team": prep.names[i], "wins": int(disp_w[i]), "losses": int(disp_l[i])}
+        for i in sorted(
+            range(n), key=lambda i: (-int(disp_w[i]), int(disp_l[i]), int(prep.seed[i]))
+        )
     ]
     return {
         "standings": standings,
