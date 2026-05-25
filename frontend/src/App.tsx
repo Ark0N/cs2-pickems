@@ -48,7 +48,7 @@ export default function App() {
   const [teams, setTeams] = useState<TeamInfo[]>([]);
   const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [results, setResults] = useState<MatchResultIn[]>([]);
-  const [nSims, setNSims] = useState(15000);
+  const [nSims, setNSims] = useState(100000);
   const [objective, setObjective] = useState<"category" | "ev">("category");
   const [enforceFeasible, setEnforceFeasible] = useState(true);
   const [useValve, setUseValve] = useState(true);
