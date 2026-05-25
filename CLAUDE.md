@@ -436,6 +436,7 @@ This project may have hooks that auto-format code after writes or validate opera
 | Date | Tasks Completed | Files Changed | Notes |
 |------|-----------------|---------------|-------|
 | 2026-05-25 | Project created | CLAUDE.md | Initial setup |
+| 2026-05-25 | Built full Cologne Major Pick'Em optimizer | backend/**, frontend/** | Swiss Buchholz Monte Carlo sim, optimizer with impossible-3-0 detection, playoffs + cosmetics, hybrid data layer (OddsPapi/HLTV/Liquipedia), FastAPI + React UI. 36 backend tests pass; UI builds & integrates over CORS. Ratings use a seed prior until ODDS_API_KEY/HLTV are wired; team seeds are provisional. |
 
 ---
 
