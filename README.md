@@ -16,22 +16,6 @@ web app.
 ## The Picks
 All three Swiss stages are optimized (Valve VRS ratings, 100k Monte Carlo sims each).
 
-Current model output (`uv run python -m app.cli --stage all --use-valve --sims 100000`):
-
-| Stage | ★ 2× 3-0 | ✓ 6× advance | ✗ 2× 0-3 | Exp. correct |
-|-------|----------|--------------|----------|:------------:|
-| **1 · Opening** | GamerLegion (31%), B8 (27%) | HEROIC, BetBoom, MIBR, BIG, SINNERS, M80 | NRG (73%), THUNDERdOWNUNDER (70%) | 6.07 / 10 |
-| **2 · Challengers** | FUT Esports (30%), Astralis (30%) | Team Spirit, G2, Legacy, GamerLegion, Monte, paiN | 9z Team (71%), SINNERS Esports (19%) † | 5.17 / 10 |
-| **3 · Legends** (Bo3) | Team Vitality (77%), Natus Vincere (33%) | Team Falcons, The MongolZ, Team Spirit, Astralis, FUT, PARIVISION | paiN Gaming (50%), Monte (46%) | 6.09 / 10 |
-
-**🏆 Champion:** Team Vitality (58%) — then Natus Vincere 27%, Team Falcons 10%, The MongolZ 3%.
-(3-0 / 0-3 figures are each team's probability of that exact result; advance slots also include the two 3-0 picks → 8 total.)
-
-> Stages 2 & 3 are **projected**: their fields cascade from each prior stage's *expected* top 8
-> and re-sharpen as real results are entered. † Layering live Bovada odds (`--use-odds`,
-> Stage 1 only for now) leaves every pick unchanged except the borderline Stage 2 0-3 slot,
-> which flips between SINNERS and M80 — a near-tie that's sensitive to seeding.
-
 **Stage 1 · Opening Stage** — the locked 16-team field:
 
 ![Stage 1 Pick'Em recommendation — 2× 3-0, 6× advance, 2× 0-3](docs/screenshots/cs2-pickem-cologne-stage1.png)
