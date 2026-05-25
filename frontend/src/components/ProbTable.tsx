@@ -29,9 +29,9 @@ export function ProbTable({ probs, pick }: { probs: TeamProb[]; pick: Pick }) {
               <tr key={p.team}>
                 <td className="team-name">{p.team}</td>
                 <td>{r && <span className={`tag tag-${r.replace("-", "")}`}>{r}</span>}</td>
-                <td><Bar value={p.p_advance} color="#3fb27f" /></td>
-                <td><Bar value={p.p_three_oh} color="#d8a13a" /></td>
-                <td><Bar value={p.p_zero_three} color="#c75d5d" /></td>
+                <td><Bar value={p.p_advance} variant="advance" /></td>
+                <td><Bar value={p.p_three_oh} variant="three" /></td>
+                <td><Bar value={p.p_zero_three} variant="zero" /></td>
               </tr>
             );
           })}

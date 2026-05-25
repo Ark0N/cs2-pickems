@@ -11,14 +11,32 @@ export function Playoffs() {
     playoffs(30000).then(setData).catch((e) => setError(String(e)));
   }, []);
 
-  if (error) return <div className="card">Failed to load playoffs: {error}</div>;
-  if (!data) return <div className="card">Simulating the playoff bracket…</div>;
+  if (error)
+    return (
+      <div className="card error">
+        <h2>Connection error</h2>
+        Failed to load playoffs: {error}
+      </div>
+    );
+  if (!data)
+    return (
+      <div className="card">
+        <div className="loading">
+          <span className="spinner" /> Simulating the playoff bracket…
+        </div>
+      </div>
+    );
 
   const c = data.cosmetics;
   return (
     <div className="grid">
       <div className="card highlight">
-        <h2>Champion pick: {data.champion_pick}</h2>
+        <h2>
+          Champion pick
+          <span className="chip" style={{ marginLeft: "auto", borderLeftColor: "var(--gold)" }}>
+            🏆 {data.champion_pick}
+          </span>
+        </h2>
         <table className="prob-table">
           <thead>
             <tr>
@@ -32,9 +50,9 @@ export function Playoffs() {
             {data.team_probs.map((p) => (
               <tr key={p.team}>
                 <td className="team-name">{p.team}</td>
-                <td><Bar value={p.p_semifinal} color="#3fb27f" /></td>
-                <td><Bar value={p.p_final} color="#d8a13a" /></td>
-                <td><Bar value={p.p_champion} color="#c98bdb" /></td>
+                <td><Bar value={p.p_semifinal} variant="advance" /></td>
+                <td><Bar value={p.p_final} variant="three" /></td>
+                <td><Bar value={p.p_champion} variant="champion" /></td>
               </tr>
             ))}
           </tbody>
