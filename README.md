@@ -1,13 +1,17 @@
 # CS2 IEM Cologne Major 2026 — Pick'Em Optimizer
 
-Data-driven optimizer for the **IEM Cologne Major 2026** Pick'Em Challenge (June 2–21, 2026).
+A data-driven engine for mastering the **IEM Cologne Major 2026** Pick'Em Challenge (June 2026).
 
-It blends **betting odds** (market-implied win probabilities) with **HLTV / Valve
-rankings**, simulates each 16-team Swiss stage under Valve's real **Buchholz pairing
-rules** (Monte Carlo), and recommends the **optimal 10-pick set** (2× 3-0, 2× 0-3,
-6× advance) per stage — while flagging **impossible combinations** (e.g. two teams that
-must play each other can't both finish 3-0). Also covers the playoff bracket and
-cosmetic picks, all in an interactive web app.
+The optimizer fuses the market's collective wisdom — the win probabilities implied by live
+**betting odds** — with the official **HLTV** and **Valve** world rankings to build a nuanced
+picture of each team's true strength. From there it runs a full **Monte Carlo** simulation of
+every Swiss stage, faithfully reproducing Valve's real **Buchholz** pairing rules, and weighs
+the entire spread of plausible outcomes to settle on the most rewarding set of predictions for
+each stage. Just as importantly, it exposes the hidden contradictions that quietly sink most
+entries — tempting picks that are in fact mutually impossible, such as two contenders whose
+paths must cross before either can complete a flawless run. Coverage extends beyond the group
+stage to the playoff bracket and the cosmetic picks, all delivered through a clean, interactive
+web app.
 
 ## The Picks
 **Stage 1** 
@@ -22,6 +26,21 @@ And the playoff **champion** pick:
 > Generated mockups styled after the in-game screen (not affiliated with Valve).
 > Team seeds are provisional — re-run before the stage locks. Regenerate by opening
 > [`docs/pickem_mockup.html`](docs/pickem_mockup.html) in a browser and screenshotting.
+
+## The live web app
+
+Those are stills from the in-client-style mockup. Below is the **actual web UI**
+(FastAPI + React), driven end to end by the same optimizer:
+
+![Web UI — header, simulation controls, and the recommended Pick'Em](docs/screenshots/pickems-hero.png)
+
+The full **Swiss Stage** view — recommendation, per-team probabilities, the live bracket, and Elo sliders:
+
+![Web UI — Swiss Stage](docs/screenshots/pickems-swiss.png)
+
+The **Playoffs** tab — champion odds and cosmetic picks:
+
+![Web UI — Playoffs](docs/screenshots/pickems-playoffs.png)
 
 ## Tournament format (researched)
 
