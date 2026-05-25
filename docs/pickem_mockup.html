@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg0:#0a0d12; --bg1:#10151d; --panel:#161d27; --panel2:#1d2733;
+    --line:#2a3744; --text:#eef3f8; --muted:#8ba0b3;
+    --gold:#f2c14e; --gold2:#caa033; --green:#3fb27f; --red:#d65a5a; --blue:#4f9dde;
+  }
+  body{ background:#05070a; font-family:"Arial","Helvetica Neue",system-ui,sans-serif; }
+  .frame{
+    width:1120px; background:
+      radial-gradient(900px 500px at 50% -8%, rgba(79,157,222,.12), transparent 60%),
+      linear-gradient(180deg, var(--bg1), var(--bg0));
+    color:var(--text); padding:34px 40px 26px; position:relative; overflow:hidden;
+  }
+  .frame::before{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(115deg, rgba(255,255,255,.025) 0 1px, transparent 1px 70px);
+    background-size:70px 70px; opacity:.5; pointer-events:none;
+  }
+  /* header */
+  .top{ display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+  .brand{ display:flex; align-items:center; gap:16px; }
+  .emblem{
+    width:58px; height:58px; border-radius:14px;
+    background:linear-gradient(145deg,#1c2735,#101720); border:1px solid #33455a;
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px;
+    letter-spacing:.5px; color:var(--gold); box-shadow:0 6px 20px rgba(0,0,0,.5);
+    text-align:center; line-height:1.05;
+  }
+  .evt{ font-size:12px; letter-spacing:3px; color:var(--muted); font-weight:700; }
+  .title{ font-size:30px; font-weight:900; letter-spacing:1.5px; margin-top:2px; }
+  .stage{ text-align:right; }
+  .stage .k{ font-size:11px; letter-spacing:2.5px; color:var(--muted); font-weight:700; }
+  .stage .v{ font-size:19px; font-weight:800; color:var(--text); margin-top:3px; }
+  .lock{ display:inline-block; margin-left:8px; font-size:12px; color:var(--green);
+         border:1px solid rgba(63,178,127,.4); border-radius:20px; padding:2px 9px; vertical-align:middle; }
+
+  .group{ margin-top:22px; position:relative; z-index:1; }
+  .ghead{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .ghead .badge{ font-size:13px; font-weight:900; letter-spacing:1.5px; padding:6px 14px; border-radius:7px; }
+  .b-30{ background:linear-gradient(180deg,#3a3115,#2a230f); color:var(--gold); border:1px solid var(--gold2); }
+  .b-adv{ background:linear-gradient(180deg,#13303f,#0f2330); color:var(--blue); border:1px solid #2d6c92; }
+  .b-03{ background:linear-gradient(180deg,#3a1818,#2a0f0f); color:var(--red); border:1px solid #7a3636; }
+  .ghead .desc{ font-size:12.5px; color:var(--muted); }
+  .ghead .count{ margin-left:auto; font-size:12px; color:var(--muted); font-weight:700; }
+
+  .row{ display:grid; gap:14px; }
+  .row.two{ grid-template-columns:1fr 1fr; }
+  .row.six{ grid-template-columns:repeat(3,1fr); }
+
+  .card{
+    position:relative; background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line); border-radius:12px; padding:16px 16px 14px;
+    display:flex; align-items:center; gap:14px; box-shadow:0 4px 16px rgba(0,0,0,.35);
+  }
+  .card.sel{ border-color:rgba(255,255,255,.18); }
+  .card.g30{ box-shadow:0 0 0 1px var(--gold2) inset, 0 6px 20px rgba(0,0,0,.4); border-color:var(--gold2); }
+  .card.g03{ box-shadow:0 0 0 1px #7a3636 inset, 0 6px 20px rgba(0,0,0,.4); border-color:#7a3636; }
+  .card .tick{
+    position:absolute; top:10px; right:12px; font-size:12px; font-weight:900;
+    width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  .g30 .tick{ background:var(--gold); color:#1a1406; }
+  .g03 .tick{ background:var(--red); color:#2a0c0c; }
+  .adv .tick{ background:var(--blue); color:#06121c; }
+
+  .logo{
+    width:54px; height:54px; border-radius:12px; flex:0 0 auto; display:flex;
+    align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#0c0f14;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.18), 0 4px 10px rgba(0,0,0,.4);
+  }
+  .meta{ min-width:0; }
+  .name{ font-size:17px; font-weight:800; letter-spacing:.2px; white-space:nowrap; }
+  .seed{ font-size:11px; color:var(--muted); margin-top:1px; }
+  .stat{ margin-top:7px; display:flex; align-items:baseline; gap:7px; }
+  .pct{ font-size:20px; font-weight:900; line-height:1; }
+  .g30 .pct{ color:var(--gold); }
+  .g03 .pct{ color:var(--red); }
+  .adv .pct{ color:var(--green); }
+  .plabel{ font-size:10.5px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; font-weight:700; }
+  .sub{ font-size:11px; color:var(--muted); margin-top:3px; }
+
+  .note{ margin-top:10px; font-size:11.5px; color:var(--muted); }
+  .foot{
+    margin-top:24px; padding-top:14px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#6f8294;
+    position:relative; z-index:1;
+  }
+  .foot b{ color:var(--muted); }
+
+  /* champion frame */
+  .champ-wrap{ display:flex; gap:26px; align-items:stretch; margin-top:20px; position:relative; z-index:1; }
+  .champ-card{
+    flex:0 0 420px; background:linear-gradient(180deg,#241d09,#13110a);
+    border:1px solid var(--gold2); border-radius:16px; padding:26px; text-align:center;
+    box-shadow:0 0 0 1px rgba(242,193,78,.25) inset, 0 10px 30px rgba(0,0,0,.5);
+  }
+  .champ-card .crown{ font-size:30px; }
+  .champ-card .logo{ width:96px; height:96px; border-radius:20px; font-size:30px; margin:10px auto 14px; }
+  .champ-card .name{ font-size:26px; }
+  .champ-card .pct{ font-size:44px; color:var(--gold); margin-top:10px; }
+  .field{ flex:1; }
+  .field h4{ font-size:12px; letter-spacing:2px; color:var(--muted); margin-bottom:12px; font-weight:800; }
+  .frow{ display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+  .frow .logo{ width:40px; height:40px; border-radius:10px; font-size:13px; }
+  .frow .nm{ font-weight:700; font-size:15px; }
+  .frow .bar{ flex:1; height:9px; background:#222d39; border-radius:6px; overflow:hidden; margin:0 6px; }
+  .frow .fill{ height:100%; background:linear-gradient(90deg,#4f9dde,#7bc0ef); border-radius:6px; }
+  .frow .fp{ width:48px; text-align:right; font-weight:800; font-size:14px; color:var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- ===================== STAGE 1 (CHALLENGERS) ===================== -->
+<div class="frame" id="stage1">
+  <div class="top">
+    <div class="brand">
+      <div class="emblem">IEM<br>2026</div>
+      <div>
+        <div class="evt">IEM COLOGNE MAJOR 2026</div>
+        <div class="title">PICK'EM CHALLENGE</div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="k">STAGE 1 · SWISS</div>
+      <div class="v">CHALLENGERS <span class="lock">✓ LOCKED</span></div>
+    </div>
+  </div>
+
+  <!-- 3-0 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-30">★ 3-0 FLAWLESS</span>
+      <span class="desc">Pick 2 teams to win all 3 with no losses</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e0564c,#9c2f2a)">GL</div>
+        <div class="meta">
+          <div class="name">GamerLegion</div><div class="seed">Seed 1</div>
+          <div class="stat"><span class="pct">31%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">82% to advance · model's #1 team</div>
+        </div>
+      </div>
+      <div class="card g30 sel">
+        <div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#f2c14e,#c79a2c)">B8</div>
+        <div class="meta">
+          <div class="name">B8</div><div class="seed">Seed 2</div>
+          <div class="stat"><span class="pct">27%</span><span class="plabel">to go 3-0</span></div>
+          <div class="sub">81% to advance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVANCE -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-adv">✓ ADVANCE · 3 WINS</span>
+      <span class="desc">Teams reaching the next stage (your two 3-0 picks also advance → 8 total)</span>
+      <span class="count">6 / 6 selected</span>
+    </div>
+    <div class="row six">
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#3f86c9,#234f74)">HER</div>
+        <div class="meta"><div class="name">HEROIC</div>
+          <div class="stat"><span class="pct">73%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#ffd23f,#caa033)">BB</div>
+        <div class="meta"><div class="name">BetBoom Team</div>
+          <div class="stat"><span class="pct">71%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#e05a5a,#9c2f2a)">MIBR</div>
+        <div class="meta"><div class="name">MIBR</div>
+          <div class="stat"><span class="pct">68%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#8a9bab,#566472)">BIG</div>
+        <div class="meta"><div class="name">BIG</div>
+          <div class="stat"><span class="pct">66%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#3fb27f,#247a55)">M80</div>
+        <div class="meta"><div class="name">M80</div>
+          <div class="stat"><span class="pct">64%</span><span class="plabel">advance</span></div></div></div>
+      <div class="card adv sel"><div class="tick">✓</div>
+        <div class="logo" style="background:linear-gradient(145deg,#d35454,#8c2f2f)">SIN</div>
+        <div class="meta"><div class="name">SINNERS Esports</div>
+          <div class="stat"><span class="pct">57%</span><span class="plabel">advance</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- 0-3 -->
+  <div class="group">
+    <div class="ghead">
+      <span class="badge b-03">✗ 0-3 ELIMINATED</span>
+      <span class="desc">Pick 2 teams to lose all 3 with no wins</span>
+      <span class="count">2 / 2 selected</span>
+    </div>
+    <div class="row two">
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#3a4a9c,#222d6b)">TDU</div>
+        <div class="meta"><div class="name">THUNDERdOWNUNDER</div><div class="seed">Seed 15</div>
+          <div class="stat"><span class="pct">60%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">weakest team in the field</div></div></div>
+      <div class="card g03 sel"><div class="tick">✗</div>
+        <div class="logo" style="background:linear-gradient(145deg,#2b3a8c,#19245c)">NRG</div>
+        <div class="meta"><div class="name">NRG</div><div class="seed">Seed 9</div>
+          <div class="stat"><span class="pct">47%</span><span class="plabel">to go 0-3</span></div>
+          <div class="sub">2nd-likeliest to whiff</div></div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings + live odds (Bovada) · Monte Carlo 100k sims · objective: category</span>
+    <span>Unofficial mockup — not affiliated with Valve</span>
+  </div>
+</div>
+
+<!-- ===================== CHAMPION ===================== -->
+<div class="frame" id="champion">
+  <div class="top">
+    <div class="brand">
+      <div class="emblem">IEM<br>2026</div>
+      <div>
+        <div class="evt">IEM COLOGNE MAJOR 2026</div>
+        <div class="title">PICK THE CHAMPION</div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="k">PLAYOFFS · SINGLE-ELIM</div>
+      <div class="v">GRAND FINAL <span class="lock">✓ LOCKED</span></div>
+    </div>
+  </div>
+
+  <div class="champ-wrap">
+    <div class="champ-card">
+      <div class="crown">👑</div>
+      <div class="logo" style="background:linear-gradient(145deg,#f4d03f,#c9a52c)">VIT</div>
+      <div class="name">Team Vitality</div>
+      <div class="seed" style="font-size:12px;color:var(--muted);margin-top:4px;">Top seed · Valve VRS #1</div>
+      <div class="pct">59%</div>
+      <div class="plabel" style="margin-top:4px;">to win the Major</div>
+    </div>
+    <div class="field">
+      <h4>FIELD — CHAMPION PROBABILITY</h4>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#f4d03f,#c9a52c)">VIT</div>
+        <div class="nm">Team Vitality</div><div class="bar"><div class="fill" style="width:100%"></div></div><div class="fp">59%</div></div>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#1f1f1f,#000)">NAVI</div>
+        <div class="nm">Natus Vincere</div><div class="bar"><div class="fill" style="width:46%"></div></div><div class="fp">27%</div></div>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#2e7d32,#1b4d1f)">FLC</div>
+        <div class="nm">Team Falcons</div><div class="bar"><div class="fill" style="width:17%"></div></div><div class="fp">10%</div></div>
+      <div class="frow"><div class="logo" style="background:linear-gradient(145deg,#c9a227,#8a6f15)">MGZ</div>
+        <div class="nm">The MongolZ</div><div class="bar"><div class="fill" style="width:6%"></div></div><div class="fp">3%</div></div>
+      <div class="note">Champion = single pick. Field assumes the top-8 Valve VRS seeds reach playoffs; re-run once the Swiss stages settle the bracket.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>cs2-pickems optimizer</b> · Valve VRS ratings · Monte Carlo 50k playoff sims (QF/SF Bo3, GF Bo5)</span>
+    <span>Unofficial mockup — not affiliated with Valve</span>
+  </div>
+</div>
+
+</body>
+</html>

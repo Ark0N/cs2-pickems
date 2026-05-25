@@ -9,6 +9,21 @@ rules** (Monte Carlo), and recommends the **optimal 10-pick set** (2× 3-0, 2× 
 must play each other can't both finish 3-0). Also covers the playoff bracket and
 cosmetic picks, all in an interactive web app.
 
+## Example: the picks it recommends
+
+The optimizer fills the in-game Pick'Em for you. Example output for **Stage 1** of
+IEM Cologne 2026 (Valve VRS ratings + live keyless odds, 100k Monte Carlo sims):
+
+![Stage 1 Pick'Em recommendation — 2× 3-0, 6× advance, 2× 0-3](docs/screenshots/cs2-pickem-cologne-stage1.png)
+
+And the playoff **champion** pick:
+
+![Major champion pick](docs/screenshots/cs2-pickem-cologne-champion.png)
+
+> Generated mockups styled after the in-game screen (not affiliated with Valve).
+> Team seeds are provisional — re-run before the stage locks. Regenerate by opening
+> [`docs/pickem_mockup.html`](docs/pickem_mockup.html) in a browser and screenshotting.
+
 ## Tournament format (researched)
 
 - 32 teams, **cascading 16-team Swiss stages**: Stage 1 → top 8 join Stage 2 invites →
@@ -78,12 +93,16 @@ rating prior. **No API key is required** to use real strength data:
   "Valve VRS ratings" toggle (on by default) or `--use-valve`. Source:
   `app/data/valve_standings.py`.
 - **HLTV ranking** — scraped best-effort (Cloudflare-protected; cached, rate-limited);
-  `--use-hltv`.
-- **Betting odds** (optional, needs a key) — set `ODDS_API_KEY` (OddsPapi free tier) in
-  `.env`; de-vigged odds then override per-matchup win probabilities (`--use-odds`).
+  `--use-hltv`. Note: Valve VRS has priority, so HLTV only takes effect when Valve is off.
+- **Betting odds (keyless, default):** Bovada's public coupon JSON — **no API key, no
+  signup**. De-vigged match odds override per-matchup win probabilities (`--use-odds`,
+  or the "use betting odds" toggle). Used purely as a probability signal — no real-money
+  betting. Optional keyed alternative: set `ODDS_API_KEY` and `ODDS_PROVIDER=oddspapi`.
 - **Liquipedia** (MediaWiki API) provides teams/seeding/results.
 
-Ratings priority when multiple are enabled: **Valve VRS → HLTV → seed prior**.
+Ratings priority when multiple are enabled: **Valve VRS → HLTV → seed prior**. The
+`/analyze` response reports the source it actually used under `data_sources`, and the UI
+shows it (e.g. "Ratings: Valve VRS — 15/16 matched · Odds: bovada (keyless) · 4 applied").
 
 > Seeds in `app/data/cologne2026.py` are **provisional** (published invite order). Refresh
 > from Valve Global Standings / Liquipedia before the event.
