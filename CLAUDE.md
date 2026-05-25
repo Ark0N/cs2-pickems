@@ -10,11 +10,25 @@ Then update the Project Overview section below.
 ---
 
 ## Project Overview
-<!-- Update this section with project-specific details -->
 - **Project Name**: cs2-pickems
-- **Description**: A new project
-- **Tech Stack**: [TECHNOLOGIES_USED]
+- **Description**: Data-driven **Pick'Em optimizer for the IEM Cologne Major 2026** (CS2,
+  Jun 2–21 2026). Blends betting odds + HLTV/Valve rankings, simulates the 16-team Swiss
+  stages under Valve's Buchholz pairing (Monte Carlo), recommends the optimal 10 picks
+  (2× 3-0, 2× 0-3, 6× advance), and flags **impossible combinations** (two teams that
+  must meet can't both go 3-0). Also covers the playoff bracket and cosmetic picks.
+- **Tech Stack**: Python 3.12 · FastAPI · NumPy/Pandas · httpx · pydantic · pytest/ruff
+  (backend); Vite + React + TypeScript (frontend); `uv` for Python env management.
 - **Last Updated**: 2026-05-25
+
+### Layout & commands
+- `backend/app/` — engine: `ratings` → `swiss` (Buchholz) → `simulate` (Monte Carlo) →
+  `optimizer` + `feasibility`; plus `playoffs`, `cosmetics`, `data/` (odds/HLTV/Liquipedia
+  + `loader`), `service.py`, `main.py` (FastAPI). `cli.py` for terminal reports.
+- `frontend/src/` — React UI (`App.tsx` + `components/`) over the API.
+- Run: `cd backend && uv sync --extra dev && uv run uvicorn app.main:app --reload`, then
+  `cd frontend && npm install && npm run dev` (http://localhost:5173).
+- Test/lint: `cd backend && uv run pytest -q && uv run ruff check .`
+- Use `uv --directory backend run ...` if the shell's working dir isn't `backend/`.
 
 ---
 
@@ -447,16 +461,31 @@ This project may have hooks that auto-format code after writes or validate opera
 **Completion Phrase**: -
 
 ### Pending Tasks
-- [ ] <!-- Add tasks here -->
+- [ ] Add `ODDS_API_KEY` to `.env` to enable live betting odds (engine uses a seed-prior
+      rating until then).
+- [ ] Refresh provisional team seeds in `backend/app/data/cologne2026.py` from Valve Global
+      Standings / Liquipedia before the event.
+- [ ] Confirm official Pick'Em point values in `backend/app/scoring.py` when the in-client
+      challenge opens.
 
 ---
 
 ## Implementation Plans
 
-<!-- Document plans before major implementations -->
+Initial build plan (approved, executed in 9 phases): `~/.claude/plans/groovy-prancing-curry.md`.
 
 ---
 
 ## Notes & Decisions
 
-<!-- Track important decisions and context -->
+- **Format (researched):** cascading 16-team Swiss stages → 8-team single-elim playoffs
+  (QF/SF Bo3, GF Bo5); Swiss advancement/elimination matches Bo3, others Bo1 (Stage 3 all Bo3).
+- **User choices:** full coverage (Swiss + playoffs + cosmetics); hybrid data (odds +
+  Liquipedia + cached HLTV, all with offline fallback); interactive web app.
+- **Optimizer objective:** default `category` (fill each slot with its best candidates —
+  intuitive marquee 3-0 picks). `ev` (global expected-points max) is offered but sacrifices a
+  borderline team into the 3-0 slot. Both stay feasibility-constrained.
+- **Impossible-combo detection:** comes from Monte Carlo *joint* samples (P(both 3-0)=0),
+  so it works pre-event and live as results are entered.
+- **Ratings:** seed-based prior until odds/HLTV are wired; `series_win_prob` inflates per-map
+  probs to Bo3/Bo5.
