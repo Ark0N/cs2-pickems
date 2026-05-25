@@ -1,16 +1,20 @@
 """Pick'Em optimizer.
 
-Chooses the 10 picks (2x 3-0, 2x 0-3, 6x advance) that maximise expected Pick'Em
-points. Expected points is linear, so given a fixed 3-0 pair and 0-3 pair the six
-advance picks are simply the highest P(advance) of the remaining teams — which
-makes an exact brute force over all (3-0 pair x 0-3 pair) combinations cheap
-(~10.9k combos).
+Chooses the 10 picks (2x 3-0, 2x 0-3, 6x advance). Two objectives are offered,
+both of which can constrain the 3-0 / 0-3 pairs to be *jointly feasible* (so the
+optimizer refuses to put two teams in the 3-0 slot when they can never both finish
+3-0 — the classic "they have to play each other" case). Feasibility comes straight
+from the Monte Carlo joint samples, so it works before and during the event.
 
-Crucially it can also *constrain* the 3-0 and 0-3 pairs to be jointly feasible —
-i.e. it refuses to put two teams in the 3-0 slot when they can never both finish
-3-0 (the classic "they have to play each other" case). That feasibility comes
-straight from the Monte Carlo joint samples, so it works before and during the
-event.
+- "category" (default): fill each slot with its genuinely best candidates — the two
+  most-likely-to-3-0 teams, the two most-likely-to-0-3, and the six most-likely-to-
+  advance. This matches how people actually want their marquee 3-0 picks chosen and
+  maximises expected correct picks *per category*.
+
+- "ev": globally maximise expected total points. This is subtly different: a 3-0
+  pick only scores on an exact 3-0, so a strong team is often "worth more" in the
+  advance slot. Pure EV therefore tends to sacrifice a borderline team into the 3-0
+  slot. Defensible, but unintuitive — offered as an alternative.
 """
 
 from __future__ import annotations
@@ -28,10 +32,12 @@ from app.simulate import StageSimulation
 @dataclass
 class OptimizeResult:
     pick: PickEm
+    objective: str
     expected_points: float
     expected_correct: float
     feasibility_enforced: bool
-    # expected points of the unconstrained optimum, for comparison
+    # expected points of the same objective WITHOUT the feasibility constraint,
+    # so the gap is purely the cost of avoiding impossible pairs.
     unconstrained_expected_points: float
 
 
@@ -41,87 +47,118 @@ def _joint_matrix(samples: np.ndarray) -> np.ndarray:
     return (f.T @ f) / samples.shape[0]
 
 
-def _best_pick_for(
-    sim: StageSimulation,
-    weights: ScoreWeights,
-    feasible_30: np.ndarray,
-    feasible_03: np.ndarray,
-) -> tuple[PickEm, float]:
-    """Exact brute force given which 3-0 / 0-3 pairs are allowed."""
-    n = len(sim.names)
-    p30 = sim.p_three_oh * weights.three_oh
-    p03 = sim.p_zero_three * weights.zero_three
-    padv = sim.p_advance * weights.advance
-
-    best_total = -np.inf
-    best: tuple[tuple[int, int], tuple[int, int], list[int]] | None = None
-
-    for a, b in combinations(range(n), 2):
-        if not feasible_30[a, b]:
+def _best_feasible_pair(
+    values: np.ndarray, feasible: np.ndarray, exclude: set[int]
+) -> tuple[int, int]:
+    """Pair (i, j) maximising values[i] + values[j] with feasible[i, j], i/j not excluded."""
+    n = len(values)
+    best: tuple[int, int] | None = None
+    best_v = -np.inf
+    for i, j in combinations(range(n), 2):
+        if i in exclude or j in exclude or not feasible[i, j]:
             continue
-        v30 = p30[a] + p30[b]
-        rest = [t for t in range(n) if t != a and t != b]
-        for c, d in combinations(rest, 2):
-            if not feasible_03[c, d]:
-                continue
-            v03 = p03[c] + p03[d]
-            adv_pool = [t for t in rest if t != c and t != d]
-            # top 6 by P(advance)
-            adv_pool.sort(key=lambda t: -padv[t])
-            adv = adv_pool[:6]
-            total = v30 + v03 + padv[adv].sum()
-            if total > best_total:
-                best_total = total
-                best = ((a, b), (c, d), adv)
+        v = values[i] + values[j]
+        if v > best_v:
+            best_v = v
+            best = (i, j)
+    if best is None:  # no feasible pair (degenerate) — take the top two by value
+        order = sorted((t for t in range(n) if t not in exclude), key=lambda t: -values[t])
+        best = (order[0], order[1])
+    return best
 
-    assert best is not None, "no feasible pick found"
-    (a, b), (c, d), adv = best
-    pick = PickEm(
+
+def _top_advance(padv: np.ndarray, exclude: set[int], k: int = 6) -> list[int]:
+    pool = sorted((t for t in range(len(padv)) if t not in exclude), key=lambda t: -padv[t])
+    return pool[:k]
+
+
+def _category_pick(
+    sim: StageSimulation, w: ScoreWeights, feas30: np.ndarray, feas03: np.ndarray
+) -> PickEm:
+    p30 = sim.p_three_oh * w.three_oh
+    p03 = sim.p_zero_three * w.zero_three
+    padv = sim.p_advance * w.advance
+    a, b = _best_feasible_pair(p30, feas30, set())
+    c, d = _best_feasible_pair(p03, feas03, {a, b})
+    adv = _top_advance(padv, {a, b, c, d})
+    return PickEm(
         three_oh=[sim.names[a], sim.names[b]],
         zero_three=[sim.names[c], sim.names[d]],
         advance=[sim.names[t] for t in adv],
     )
-    return pick, float(best_total)
+
+
+def _ev_pick(
+    sim: StageSimulation, w: ScoreWeights, feas30: np.ndarray, feas03: np.ndarray
+) -> PickEm:
+    """Exact global EV optimum: brute force over feasible (3-0 pair x 0-3 pair)."""
+    n = len(sim.names)
+    p30 = sim.p_three_oh * w.three_oh
+    p03 = sim.p_zero_three * w.zero_three
+    padv = sim.p_advance * w.advance
+
+    best_total = -np.inf
+    best: tuple[tuple[int, int], tuple[int, int], list[int]] | None = None
+    for a, b in combinations(range(n), 2):
+        if not feas30[a, b]:
+            continue
+        v30 = p30[a] + p30[b]
+        rest = [t for t in range(n) if t != a and t != b]
+        for c, d in combinations(rest, 2):
+            if not feas03[c, d]:
+                continue
+            adv = _top_advance(padv, {a, b, c, d})
+            total = v30 + p03[c] + p03[d] + padv[adv].sum()
+            if total > best_total:
+                best_total = total
+                best = ((a, b), (c, d), adv)
+    assert best is not None, "no feasible pick found"
+    (a, b), (c, d), adv = best
+    return PickEm(
+        three_oh=[sim.names[a], sim.names[b]],
+        zero_three=[sim.names[c], sim.names[d]],
+        advance=[sim.names[t] for t in adv],
+    )
+
+
+_SELECTORS = {"category": _category_pick, "ev": _ev_pick}
 
 
 def optimize(
     sim: StageSimulation,
     weights: ScoreWeights = DEFAULT_WEIGHTS,
+    objective: str = "category",
     enforce_feasible: bool = True,
     eps: float = 0.0,
 ) -> OptimizeResult:
-    """Maximise expected Pick'Em points.
-
-    When `enforce_feasible`, the 3-0 pair and 0-3 pair are restricted to pairs that
-    co-occur in at least `eps` (fraction) of simulations — so impossible pairs are
-    excluded. The unconstrained optimum is also computed for comparison.
-    """
+    if objective not in _SELECTORS:
+        raise ValueError(f"objective must be one of {list(_SELECTORS)}")
+    select = _SELECTORS[objective]
     n = len(sim.names)
-    j30 = _joint_matrix(sim.s_three_oh)
-    j03 = _joint_matrix(sim.s_zero_three)
-
     all_true = np.ones((n, n), dtype=bool)
-    _, unconstrained_pts = _best_pick_for(sim, weights, all_true, all_true)
 
+    # same objective, no feasibility constraint — the EV ceiling for comparison
+    unconstrained = select(sim, weights, all_true, all_true)
+    unconstrained_pts = evaluate(unconstrained, sim, weights)["expected_points"]
+
+    feas30 = feas03 = all_true
     if enforce_feasible:
-        feas30 = j30 > eps
-        feas03 = j03 > eps
-        # guard: if the field is so lopsided that fewer than one feasible pair
-        # exists, fall back to unconstrained rather than failing.
-        if feas30.sum() < 2 or feas03.sum() < 2:
-            feas30, feas03 = all_true, all_true
+        f30 = _joint_matrix(sim.s_three_oh) > eps
+        f03 = _joint_matrix(sim.s_zero_three) > eps
+        if f30.sum() >= 2 and f03.sum() >= 2:  # guard against over-constraining
+            feas30, feas03 = f30, f03
+        else:
             enforce_feasible = False
-    else:
-        feas30, feas03 = all_true, all_true
 
-    pick, pts = _best_pick_for(sim, weights, feas30, feas03)
+    pick = select(sim, weights, feas30, feas03)
     metrics = evaluate(pick, sim, weights)
     return OptimizeResult(
         pick=pick,
-        expected_points=round(pts, 4),
+        objective=objective,
+        expected_points=metrics["expected_points"],
         expected_correct=metrics["expected_correct"],
         feasibility_enforced=enforce_feasible,
-        unconstrained_expected_points=round(unconstrained_pts, 4),
+        unconstrained_expected_points=unconstrained_pts,
     )
 
 
@@ -138,7 +175,6 @@ def evaluate(pick: PickEm, sim: StageSimulation, weights: ScoreWeights = DEFAULT
     correct = c30 + c03 + cadv  # 0..10
     points = weights.three_oh * c30 + weights.zero_three * c03 + weights.advance * cadv
 
-    n_sims = sim.n_sims
     correct_ge = {k: float((correct >= k).mean()) for k in range(0, 11)}
     return {
         "expected_points": round(float(points.mean()), 4),
@@ -148,5 +184,5 @@ def evaluate(pick: PickEm, sim: StageSimulation, weights: ScoreWeights = DEFAULT
         "p_all_6_advance": round(float((cadv == 6).mean()), 4),
         "p_all_8_advancing": round(float(((c30 + cadv) == 8).mean()), 4),
         "correct_ge": {k: round(v, 4) for k, v in correct_ge.items()},
-        "n_sims": n_sims,
+        "n_sims": sim.n_sims,
     }
