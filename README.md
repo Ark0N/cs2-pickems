@@ -132,7 +132,9 @@ rating prior. **No API key is required** to use real strength data:
   signup**. De-vigged match odds override per-matchup win probabilities (`--use-odds`,
   or the "use betting odds" toggle). Used purely as a probability signal — no real-money
   betting. Optional keyed alternative: set `ODDS_API_KEY` and `ODDS_PROVIDER=oddspapi`.
-- **Liquipedia** (MediaWiki API) provides teams/seeding/results.
+- **Liquipedia** — the roster and seeding in `app/data/cologne2026.py` were researched from it
+  by hand; a MediaWiki helper (`app/data/liquipedia.py`) exists but isn't yet wired into the
+  live pipeline.
 
 Ratings priority when multiple are enabled: **Valve VRS → HLTV → seed prior**. The
 `/analyze` response reports the source it actually used under `data_sources`, and the UI
