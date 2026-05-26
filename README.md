@@ -2,7 +2,7 @@
 
 A data-driven engine for mastering the **IEM Cologne Major 2026** Pick'Em Challenge (June 2026).
 
-It grounds every team's strength in the official **Valve** world ranking, then plays each Swiss
+It rates all 32 teams from the official **Valve** world ranking, then plays each Swiss
 stage out **100,000 times** in a **Monte Carlo** simulation under Valve's exact **Buchholz**
 pairing — measuring how often each team goes 3-0, advances, or crashes to 0-3 across every
 plausible outcome. Those probabilities drive the highest-scoring entry for each stage, and
