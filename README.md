@@ -2,13 +2,13 @@
 
 A data-driven engine for mastering the **IEM Cologne Major 2026** Pick'Em Challenge (June 2026).
 
-This engine solves the Pick'Em. It rates every team from the official **Valve** world ranking,
-then plays out each Swiss stage **100,000 times** in a **Monte Carlo** simulation under Valve's
-exact **Buchholz** pairing to see how the bracket really breaks. From that spread it locks in
-the highest-scoring entry for every stage — and catches the trap that sinks most players: two
-teams that can't both finish 3-0 because their paths have to cross first. Layer in live
-**betting odds** to sharpen the close matchups, then carry it through the playoff bracket and
-cosmetic picks — all in a clean, interactive web app.
+It grounds every team's strength in the official **Valve** world ranking, then plays each Swiss
+stage out **100,000 times** in a **Monte Carlo** simulation under Valve's exact **Buchholz**
+pairing — measuring how often each team goes 3-0, advances, or crashes to 0-3 across every
+plausible outcome. Those probabilities drive the highest-scoring entry for each stage, and
+expose the trap that sinks most players: two teams that can't both finish 3-0 because their
+paths have to cross first. Layer in live **betting odds** to sharpen the close calls, then carry
+it through the playoff bracket and cosmetic picks — all in a clean, interactive web app.
 
 ## The Picks
 All three Swiss stages are optimized (Valve VRS ratings, 100k Monte Carlo sims each).
